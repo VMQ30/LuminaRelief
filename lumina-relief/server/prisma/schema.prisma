@@ -26,6 +26,7 @@ model User {
   id                  Int                  @id @default(autoincrement())
   name                String
   email               String               @unique
+  password            String
   contact             String
   locationAssignments LocationAssignment[]
   auditLogs           AuditLog[]
@@ -37,7 +38,12 @@ model Location {
   id                Int                  @id @default(autoincrement())
   name              String               @unique
   coordinates       Float                @unique
-  address           String               @unique
+  barangay          String
+  city              String
+  province          String
+  region            String
+  zipCode           String
+  country           String
   status            Status
   locationContacts  LocationContact[]
   locationAssignments LocationAssignment[]
