@@ -37,7 +37,8 @@ model User {
 model Location {
   id                Int                  @id @default(autoincrement())
   name              String               @unique
-  coordinates       Float                @unique
+  latitude          Float
+  longitude         Float
   barangay          String
   city              String
   province          String

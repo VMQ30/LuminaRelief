@@ -9,7 +9,7 @@ const adapter = new PrismaPg(pool);
 const prisma =
   global.prisma ||
   new PrismaClient({
-    adapter, // This line is what fixes the error!
+    adapter,
     log: ["query", "info", "warn", "error"],
   });
 
