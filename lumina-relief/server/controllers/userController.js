@@ -70,6 +70,11 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (e) {
+    if (e.code === "P2002") {
+      return res.status(409).json({
+        message: "This user is already registered",
+      });
+    }
     console.error(e);
     return res.status(500).json({ message: "Internal server error" });
   }
