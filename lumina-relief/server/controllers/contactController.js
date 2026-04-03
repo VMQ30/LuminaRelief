@@ -1,26 +1,20 @@
-import contact from "../models/Contact.js";
+import contactService from "../services/contactService";
 
 const insertContact = async (req, res) => {
   try {
-    const { userContact } = req.body;
-    if (!userContact) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const contactInfo = await contact.getContact(userContact);
-    if (contactInfo) {
-      return res.status(200).json({
-        message: "Contact already exists, returning existing data",
-        data: contactInfo,
-      });
-    }
-
-    const newContact = await contact.setContact(userContact);
-
+    const newContact = await contactService.createContact(req.body);
     return res
       .status(201)
       .json({ message: "Contact successfully created", contact: newContact });
   } catch (e) {
+    if (e.message == "Missing required fields for Contact") {
+      return res.status(400).json({ message: e.message });
+    } else if (
+      e.message ==
+      "Invalid contact format. Must be a valid Email , Website , or PH Phone/Hotline number."
+    ) {
+      return res.status(400).json({ message: e.message });
+    }
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
   }

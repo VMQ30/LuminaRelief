@@ -67,6 +67,7 @@ model LocationAssignment {
 model Contact {
   id               Int               @id @default(autoincrement())
   contactInfo      String            @unique @map("contact_info")
+  contactType      String            @map("contact_type")
   locationContacts LocationContact[]
 
   @@map("contacts")
