@@ -1,18 +1,9 @@
-import LocationAssignment from "../models/LocationAssignment.js";
+import locationAssignmentService from "../services/locationAssignmentService.js";
 
 const locationAssignment = async (req, res) => {
   try {
-    const { locationId, userId } = req.body;
-
-    if (!locationId || !userId) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
-    }
-
     const newLocationAssignment =
-      await LocationAssignment.setLocationAssignment(+locationId, +userId);
-
+      locationAssignmentService.createLocationAssignment(req.body);
     return res.status(201).json({
       message: "Successfully added user to location",
       data: newLocationAssignment,
