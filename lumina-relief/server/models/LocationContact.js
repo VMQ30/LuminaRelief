@@ -4,8 +4,8 @@ const LocationContact = {
   async linkContactToLocation(locationId, contactId) {
     return await prisma.locationContact.create({
       data: {
-        locationId: parseInt(locationId),
-        contactId: parseInt(contactId),
+        locationId: +locationId,
+        contactId: +contactId,
       },
     });
   },

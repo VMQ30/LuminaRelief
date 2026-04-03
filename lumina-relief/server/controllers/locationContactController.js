@@ -1,4 +1,4 @@
-import LocationContact from "../models/LocationContact";
+import LocationContact from "../models/LocationContact.js";
 import Contact from "../models/Contact.js";
 
 const connectLocationContact = async (req, res) => {
