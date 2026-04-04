@@ -9,6 +9,10 @@ const locationAssignmentService = {
     const locationId = +data.locationId;
     const userId = +data.userId;
 
+    if ([locationId, userId].some(isNaN)) {
+      throw new Error("Invalid values");
+    }
+
     const locationExists = await prisma.location.findUnique({
       where: { id: locationId },
     });

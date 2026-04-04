@@ -1,4 +1,4 @@
-import locationContractService from "../services/locationContractService.js";
+import locationContractService from "../services/locationContactService.js";
 
 const connectLocationContact = async (req, res) => {
   try {
