@@ -24,7 +24,10 @@ export const formatContactInfo = (input) => {
     return { value: formatted, type: "PHONE" };
   }
 
-  if (numericOnly.length === 10 && numericOnly.startsWith("0")) {
+  if (
+    PH_LANDLINE_REGEX.test(numericOnly) ||
+    (numericOnly.length === 10 && numericOnly.startsWith("0"))
+  ) {
     let formatted = "";
     if (numericOnly.startsWith("02")) {
       formatted = `${numericOnly.substring(0, 2)}-${numericOnly.substring(2, 6)}-${numericOnly.substring(6)}`;
