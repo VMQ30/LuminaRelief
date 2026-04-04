@@ -1,29 +1,8 @@
-import user from "../models/User.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import userService from "../services/userService.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, contact } = req.body;
-
-    if (!name || !email || !password || !contact) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const existingUser = await user.getUserByEmail(email);
-    if (existingUser) {
-      return res.status(409).json({ message: "Email already in use" });
-    }
-
-    const saltRounds = 10;
-    const hashedPass = await bcrypt.hash(password, saltRounds);
-
-    const newUser = await user.setUser({
-      name,
-      email,
-      contact,
-      password: hashedPass,
-    });
+    const newUser = await userService.setUser(req.body);
 
     return res.status(201).json({
       message: "User successfully registered",
@@ -34,6 +13,18 @@ export const registerUser = async (req, res) => {
       },
     });
   } catch (e) {
+    if (e.code === "P2002") {
+      return res.status(400).json({ message: "Location name already exists" });
+    }
+    const clientErrors = [
+      "All fields are required",
+      "Email already in use",
+      "Contact already in use",
+    ];
+    if (clientErrors.includes(e.message) || e.message.includes("Invalid")) {
+      return res.status(400).json({ message: e.message });
+    }
+
     console.error(e);
     return res.status(500).json({ message: "Internal server error" });
   }
@@ -41,39 +32,23 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const { userEmail, userPassword } = req.body;
-    if (!userEmail || !userPassword) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const results = await user.getUserByEmail(userEmail);
-    if (!results) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(userPassword, results.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    const token = jwt.sign(
-      { id: results.id, email: results.email },
-      { expiresIn: "1h" },
-      process.env.JWT_SECRET,
-    );
+    const result = await userService.loginUser(req.body);
 
     return res.status(200).json({
-      message: "User successfully loged in",
-      token,
-      user: {
-        id: results.id,
-      },
+      message: "User successfully logged in",
+      token: result.token,
+      id: result.user.id,
     });
   } catch (e) {
     if (e.code === "P2002") {
       return res.status(409).json({
         message: "This user is already registered",
       });
+    } else if (
+      e.message === "Invalid email or password" ||
+      e.message === "All fields are required"
+    ) {
+      return res.status(401).json({ message: e.message });
     }
     console.error(e);
     return res.status(500).json({ message: "Internal server error" });
