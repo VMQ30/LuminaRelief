@@ -50,7 +50,7 @@ export const formatContactInfo = (input) => {
 export const contactService = {
   async createContact(data) {
     if (!data.contact) {
-      throw new Error("Missing required fields for Contact");
+      throw new Error("Missing required fields");
     }
 
     const { value, type } = formatContactInfo(data.contact);

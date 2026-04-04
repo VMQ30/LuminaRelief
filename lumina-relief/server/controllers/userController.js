@@ -1,5 +1,9 @@
 import userService from "../services/userService.js";
-
+const errorMessages = [
+  "All fields are required",
+  "Email already in use",
+  "Contact already in use",
+];
 export const registerUser = async (req, res) => {
   try {
     const newUser = await userService.setUser(req.body);
@@ -16,12 +20,7 @@ export const registerUser = async (req, res) => {
     if (e.code === "P2002") {
       return res.status(400).json({ message: "Location name already exists" });
     }
-    const clientErrors = [
-      "All fields are required",
-      "Email already in use",
-      "Contact already in use",
-    ];
-    if (clientErrors.includes(e.message) || e.message.includes("Invalid")) {
+    if (errorMessages.includes(e.message) || e.message.includes("Invalid")) {
       return res.status(400).json({ message: e.message });
     }
 

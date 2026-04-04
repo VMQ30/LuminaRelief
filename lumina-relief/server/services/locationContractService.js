@@ -8,7 +8,7 @@ const locationContractService = {
     }
     const { value: formattedVal, type } = formatContactInfo(data.contactVal);
     if (!type) {
-      throw new Error("Invalid contact format.");
+      throw new Error("Invalid contact format");
     }
 
     let targetContact = await prisma.contact.findFirst({

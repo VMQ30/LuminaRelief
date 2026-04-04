@@ -1,4 +1,5 @@
-import contactService from "../services/contactService";
+import contactService from "../services/contactService.js";
+const errorMessages = ["Invalid contact format", "Missing required fields"];
 
 const insertContact = async (req, res) => {
   try {
@@ -7,12 +8,7 @@ const insertContact = async (req, res) => {
       .status(201)
       .json({ message: "Contact successfully created", contact: newContact });
   } catch (e) {
-    if (e.message == "Missing required fields for Contact") {
-      return res.status(400).json({ message: e.message });
-    } else if (
-      e.message ==
-      "Invalid contact format. Must be a valid Email , Website , or PH Phone/Hotline number."
-    ) {
+    if (errorMessages.includes(e.message)) {
       return res.status(400).json({ message: e.message });
     }
     console.log(e);

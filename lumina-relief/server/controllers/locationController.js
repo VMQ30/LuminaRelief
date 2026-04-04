@@ -1,5 +1,9 @@
 import locationService from "../services/locationService.js";
-
+const errorMessages = [
+  "Location name already exists",
+  "Could not find",
+  "Missing required fields for Location",
+];
 export const createLocation = async (req, res) => {
   try {
     const newLocation = await locationService.createLocation(req.body);
@@ -8,12 +12,8 @@ export const createLocation = async (req, res) => {
       .json({ message: "Location successfully added", location: newLocation });
   } catch (e) {
     if (e.code === "P2002") {
-      return res.status(400).json({ message: "Location name already exists" });
-    } else if (
-      e.message === "Could not find coordinates for the provided address"
-    ) {
-      return res.status(400).json({ message: e.message });
-    } else if (e.message === "Missing required fields for Location") {
+      return res.status(409).json({ message: e.message });
+    } else if (errorMessages.includes(e.message)) {
       return res.status(400).json({ message: e.message });
     }
     console.log(e);

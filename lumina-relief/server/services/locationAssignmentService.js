@@ -6,15 +6,18 @@ const locationAssignmentService = {
       throw new Error("All fields are required");
     }
 
+    const locationId = +data.locationId;
+    const userId = +data.userId;
+
     const locationExists = await prisma.location.findUnique({
-      where: { id: data.locationId },
+      where: { id: locationId },
     });
-    if (!locationExists) throw new Error("LOCATION_NOT_FOUND");
+    if (!locationExists) throw new Error("Location not Found");
 
     return await prisma.locationAssignment.create({
       data: {
-        locationId: +data.locationId,
-        userId: +data.userId,
+        locationId: locationId,
+        userId: userId,
       },
     });
   },

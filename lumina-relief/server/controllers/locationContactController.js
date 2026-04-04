@@ -2,7 +2,7 @@ import locationContractService from "../services/locationContractService.js";
 
 const connectLocationContact = async (req, res) => {
   try {
-    const newLink = locationContractService.createLocationContractService(
+    const newLink = await locationContractService.createLocationContractService(
       req.body,
     );
     return res.status(201).json({
@@ -14,7 +14,10 @@ const connectLocationContact = async (req, res) => {
       return res.status(409).json({
         message: "This contact is already assigned to this location",
       });
-    } else if (e.message === "All fields are required") {
+    } else if (
+      e.message === "All fields are required" ||
+      e.message === "Invalid contact format"
+    ) {
       return res.status(400).json({ message: e.message });
     }
     console.error(e);

@@ -54,12 +54,12 @@ const userService = {
       throw new Error("All fields are required");
     }
 
-    email = data.email.trim().toLowerCase();
+    const email = data.email.trim().toLowerCase();
 
     const user = await prisma.user.findFirst({
       where: { email: email },
     });
-    if (!user || !(await bcrypt.compare(userPassword, results.password))) {
+    if (!user || !(await bcrypt.compare(data.password.trim(), user.password))) {
       throw new Error("Invalid email or password");
     }
 
