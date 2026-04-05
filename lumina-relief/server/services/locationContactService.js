@@ -1,8 +1,8 @@
 import prisma from "../config/database.js";
 import { contactService, formatContactInfo } from "./contactService.js";
 
-const locationContractService = {
-  async createLocationContractService(data) {
+const locationContactService = {
+  async createLocationContactService(data) {
     if (!data.locationId || !data.contactVal) {
       throw new Error("All fields are required");
     }
@@ -30,4 +30,4 @@ const locationContractService = {
   },
 };
 
-export default locationContractService;
+export default locationContactService;

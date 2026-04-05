@@ -6,7 +6,13 @@ const errorMessages = [
 ];
 export const registerUser = async (req, res) => {
   try {
-    const newUser = await userService.setUser(req.body);
+    const { name, email, contact, password } = req.body;
+    const newUser = await userService.setUser({
+      name,
+      email,
+      contact,
+      password,
+    });
 
     return res.status(201).json({
       message: "User successfully registered",
@@ -18,7 +24,7 @@ export const registerUser = async (req, res) => {
     });
   } catch (e) {
     if (e.code === "P2002") {
-      return res.status(400).json({ message: "Location name already exists" });
+      return res.status(400).json({ message: "User already exists" });
     }
     if (errorMessages.includes(e.message) || e.message.includes("Invalid")) {
       return res.status(400).json({ message: e.message });
@@ -31,7 +37,8 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const result = await userService.loginUser(req.body);
+    const { email, password } = req.body;
+    const result = await userService.loginUser({ email, password });
 
     return res.status(200).json({
       message: "User successfully logged in",
@@ -39,11 +46,7 @@ export const loginUser = async (req, res) => {
       id: result.user.id,
     });
   } catch (e) {
-    if (e.code === "P2002") {
-      return res.status(409).json({
-        message: "This user is already registered",
-      });
-    } else if (
+    if (
       e.message === "Invalid email or password" ||
       e.message === "All fields are required"
     ) {

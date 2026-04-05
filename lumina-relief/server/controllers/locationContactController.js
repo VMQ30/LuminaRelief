@@ -1,10 +1,12 @@
-import locationContractService from "../services/locationContactService.js";
+import locationContactService from "../services/locationContactService.js";
 
 const connectLocationContact = async (req, res) => {
   try {
-    const newLink = await locationContractService.createLocationContractService(
-      req.body,
-    );
+    const { locationId, contactVal } = req.body;
+    const newLink = await locationContactService.createLocationContactService({
+      locationId,
+      contactVal,
+    });
     return res.status(201).json({
       message: "Successfully added contact to location",
       data: newLink,

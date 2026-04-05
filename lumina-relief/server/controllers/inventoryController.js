@@ -10,7 +10,14 @@ const errorMessages = [
 
 export const setInventory = async (req, res) => {
   try {
-    const newInventory = await inventoryService.setInventory(req.body);
+    const { quantity, locationId, resourceId } = req.body;
+
+    const newInventory = await inventoryService.setInventory({
+      quantity,
+      locationId,
+      resourceId,
+      userId: req.user.id,
+    });
     return res.status(201).json({
       message: "Inventory successfully added",
       inventory: newInventory,
@@ -28,7 +35,12 @@ export const setInventory = async (req, res) => {
 
 export const updateInventory = async (req, res) => {
   try {
-    const updatedInventory = inventoryService.updateInventory(req.body);
+    const { inventoryId, changeAmount } = req.body;
+    const updatedInventory = await inventoryService.updateInventory({
+      inventoryId,
+      changeAmount,
+      userId: req.user.id,
+    });
     return res.status(201).json({
       message: "Inventory successfully added",
       inventory: updatedInventory,

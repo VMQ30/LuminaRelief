@@ -29,15 +29,8 @@ const userService = {
     const saltRounds = 10;
     const name = toTitleCase(data.name.trim());
     const email = validatedEmail;
-    const password = await bcrypt.hash(data.password.trim(), saltRounds);
+    const password = await bcrypt.hash(data.password, saltRounds);
     const contact = formattedContact;
-
-    const existingUser = await prisma.user.findFirst({
-      where: { email: email },
-    });
-    if (existingUser) {
-      throw new Error("Email already in use");
-    }
 
     return await prisma.user.create({
       data: {
@@ -59,7 +52,7 @@ const userService = {
     const user = await prisma.user.findFirst({
       where: { email: email },
     });
-    if (!user || !(await bcrypt.compare(data.password.trim(), user.password))) {
+    if (!user || !(await bcrypt.compare(data.password, user.password))) {
       throw new Error("Invalid email or password");
     }
 

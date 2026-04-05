@@ -5,8 +5,8 @@ const auditLogService = {
     if (
       !data.inventoryId ||
       !data.userId ||
-      !data.prevQuantity ||
-      !data.newQuantity
+      data.prevQuantity === undefined ||
+      data.newQuantity === undefined
     ) {
       throw new Error("All fields are required");
     }
@@ -17,7 +17,7 @@ const auditLogService = {
     const newQuantity = +data.newQuantity;
 
     if ([inventoryId, userId, prevQuantity, newQuantity].some(isNaN)) {
-      throw new Error("Invalid numeric values provided for audit log");
+      throw new Error("Invalid values provided for audit log");
     }
 
     return prisma.auditLog.create({

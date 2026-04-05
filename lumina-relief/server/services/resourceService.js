@@ -12,7 +12,7 @@ const resourceService = {
     const name = toTitleCase(data.name.trim());
 
     return prisma.resource.create({
-      data: { category: category, name: name, unit: unit },
+      data: { category, name, unit },
     });
   },
 };

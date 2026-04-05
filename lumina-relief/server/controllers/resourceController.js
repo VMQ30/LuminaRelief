@@ -2,7 +2,12 @@ import resourceService from "../services/resourceService.js";
 
 const addResource = async (req, res) => {
   try {
-    const newResource = await resourceService.setResource(req.body);
+    const { category, name, unit } = req.body;
+    const newResource = await resourceService.setResource({
+      category,
+      name,
+      unit,
+    });
 
     return res.status(201).json({
       message: "Successfully added resource",
@@ -13,7 +18,7 @@ const addResource = async (req, res) => {
       return res.status(400).json({ message: e.message });
     } else if (e.code === "P2002") {
       return res.status(409).json({
-        message: "This user is already assigned to this location",
+        message: "This resourcealready exists",
       });
     }
 
