@@ -1,6 +1,6 @@
 import NodeGeocoder from "node-geocoder";
 import prisma from "../config/database.js";
-import toTitleCase from "../utils/titleCase.js";
+import { locationSchema } from "../validators/locationValidator.js";
 
 const geocoder = NodeGeocoder({
   provider: "openstreetmap",
@@ -8,29 +8,9 @@ const geocoder = NodeGeocoder({
 
 const locationService = {
   async createLocation(data) {
-    if (
-      !data.name ||
-      !data.barangay ||
-      !data.city ||
-      !data.province ||
-      !data.zipCode ||
-      !data.country ||
-      !data.status
-    ) {
-      throw new Error("Missing required fields for Location");
-    }
-    const cleanData = {
-      name: toTitleCase(data.name.trim()),
-      barangay: toTitleCase(data.barangay.trim()),
-      city: toTitleCase(data.city.trim()),
-      province: toTitleCase(data.province.trim()),
-      region: data.region.toUpperCase().trim(),
-      zipCode: data.zipCode.trim(),
-      country: toTitleCase(data.country.trim() || "Philippines"),
-      status: data.status,
-    };
+    const validatedData = locationSchema.parse(data);
 
-    const address = `${cleanData.barangay}, ${cleanData.city}, ${cleanData.province}, ${cleanData.zipCode}, ${cleanData.country}`;
+    const address = `${validatedData.barangay}, ${validatedData.city}, ${validatedData.province}, ${validatedData.zipCode}, ${validatedData.country}`;
 
     try {
       const geoResponse = await geocoder.geocode(address);
@@ -44,7 +24,7 @@ const locationService = {
 
       return await prisma.location.create({
         data: {
-          ...cleanData,
+          ...validatedData,
           latitude,
           longitude,
         },

@@ -1,4 +1,5 @@
 import prisma from "../config/database.js";
+import { contactSchema } from "../validators/contactValidators.js";
 
 const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const PH_PHONE_REGEX = /^(09|\+639)\d{9}$/;
@@ -46,31 +47,20 @@ export const formatContactInfo = (input) => {
 
   return { value: cleanData, type: null };
 };
-
 export const contactService = {
-  async createContact(data) {
-    if (!data.contact) {
-      throw new Error("Missing required fields");
-    }
-
-    const { value, type } = formatContactInfo(data.contact);
-
-    if (!type) {
-      throw new Error(
-        "Invalid contact format. Must be a valid Email , Website , or PH Phone/Hotline number.",
-      );
-    }
+  async createContact(rawData) {
+    const { contact } = contactSchema.parse(rawData);
 
     const existing = await prisma.contact.findUnique({
-      where: { contactInfo: value },
+      where: { contactInfo: contact.value },
     });
 
     if (existing) return existing;
 
     return await prisma.contact.create({
       data: {
-        contactInfo: value,
-        contactType: type,
+        contactInfo: contact.value,
+        contactType: contact.type,
       },
     });
   },

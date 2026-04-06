@@ -1,5 +1,9 @@
 import prisma from "../config/database.js";
 import auditLogService from "./auditLogsService.js";
+import {
+  inventorySchema,
+  updateInventorySchema,
+} from "../validators/inventoryValidator.js";
 
 const getStatus = (q) => {
   if (q <= 0) return "OUT_OF_STOCK";
@@ -10,70 +14,56 @@ const getStatus = (q) => {
 
 const inventoryService = {
   async setInventory(data) {
-    if (
-      data.quantity === undefined ||
-      !data.locationId ||
-      !data.resourceId ||
-      !data.userId
-    ) {
-      throw new Error("All fields are required");
-    }
-
-    const quantity = +data.quantity;
-    const locationId = +data.locationId;
-    const resourceId = +data.resourceId;
-    const userId = +data.userId;
-
-    if ([quantity, locationId, resourceId].some(isNaN)) {
-      throw new Error("Invalid values");
-    }
+    const verifiedData = inventorySchema.parse(data);
 
     const locationExists = await prisma.location.findUnique({
-      where: { id: locationId },
+      where: { id: verifiedData.locationId },
     });
     if (!locationExists) throw new Error("Location not Found");
 
     const resourceExists = await prisma.resource.findUnique({
-      where: { id: resourceId },
+      where: { id: verifiedData.resourceId },
     });
     if (!resourceExists) throw new Error("Resource not Found");
 
     const newInventory = await prisma.inventory.create({
       data: {
-        quantity,
-        stockLevel: getStatus(quantity),
-        locationId,
-        resourceId,
+        ...verifiedData,
+        stockLevel: getStatus(verifiedData.quantity),
       },
     });
 
     await auditLogService.setAuditLog({
       inventoryId: newInventory.id,
-      userId: +userId,
+      userId: verifiedData.userId,
       prevQuantity: 0,
-      newQuantity: quantity,
+      newQuantity: verifiedData.quantity,
     });
 
     return newInventory;
   },
 
   async updateInventory(data) {
-    if (!data.inventoryId || !data.userId || data.changeAmount === undefined) {
-      throw new Error("Missing values for update");
-    }
+    const validatedData = updateInventorySchema.parse(data);
 
     const currentItem = await prisma.inventory.findUnique({
-      where: { id: +data.inventoryId },
+      where: { id: validatedData.inventoryId },
     });
     if (!currentItem) throw new Error("Inventory record not found");
 
-    const prevQuantity = currentItem.quantity;
-    const newQuantity = prevQuantity + +data.changeAmount;
+    let newQuantity;
+    if (validatedData.action === "ADD") {
+      newQuantity = currentItem.quantity + validatedData.changeAmount;
+    } else if (validatedData.action === "SUBTRACT") {
+      newQuantity = currentItem.quantity - validatedData.changeAmount;
+    } else {
+      newQuantity = validatedData.changeAmount;
+    }
 
     if (newQuantity < 0) throw new Error("Insufficient stock");
 
     const updatedInventory = await prisma.inventory.update({
-      where: { id: +data.inventoryId },
+      where: { id: validatedData.inventoryId },
       data: {
         quantity: newQuantity,
         stockLevel: getStatus(newQuantity),
@@ -83,7 +73,7 @@ const inventoryService = {
     await auditLogService.setAuditLog({
       inventoryId: updatedInventory.id,
       userId: +data.userId,
-      prevQuantity: prevQuantity,
+      prevQuantity: currentItem.quantity,
       newQuantity: newQuantity,
     });
 

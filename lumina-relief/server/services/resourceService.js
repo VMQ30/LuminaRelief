@@ -1,18 +1,11 @@
 import prisma from "../config/database.js";
-import toTitleCase from "../utils/titleCase.js";
+import { resourceSchema } from "../validators/resouceValidator.js";
 
 const resourceService = {
   async setResource(data) {
-    if (!data.category || !data.name || !data.unit) {
-      throw new Error("All fields are required");
-    }
-
-    const category = toTitleCase(data.category.trim());
-    const unit = toTitleCase(data.unit.trim());
-    const name = toTitleCase(data.name.trim());
-
+    const validatedData = resourceSchema.parse(data);
     return prisma.resource.create({
-      data: { category, name, unit },
+      data: { ...validatedData },
     });
   },
 };

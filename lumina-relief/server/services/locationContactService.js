@@ -1,29 +1,23 @@
 import prisma from "../config/database.js";
 import { contactService, formatContactInfo } from "./contactService.js";
+import { locationContactSchema } from "../validators/locationContactValidator.js";
 
 const locationContactService = {
   async createLocationContactService(data) {
-    if (!data.locationId || !data.contactVal) {
-      throw new Error("All fields are required");
-    }
-    const { value: formattedVal, type } = formatContactInfo(data.contactVal);
-    if (!type) {
+    const validatedData = locationContactSchema.parse(data);
+
+    const locationExists = formatContactInfo(validatedData.contactVal);
+    if (!locationExists) {
       throw new Error("Invalid contact format");
     }
 
-    let targetContact = await prisma.contact.findFirst({
-      where: { contactInfo: formattedVal },
+    const targetContact = await contactService.createContact({
+      contact: validatedData.contactVal,
     });
-
-    if (!targetContact) {
-      targetContact = await contactService.createContact({
-        contact: data.contactVal,
-      });
-    }
 
     return await prisma.locationContact.create({
       data: {
-        locationId: +data.locationId,
+        locationId: validatedData.locationId,
         contactId: targetContact.id,
       },
     });

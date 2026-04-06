@@ -39,7 +39,6 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const result = await userService.loginUser({ email, password });
-
     return res.status(200).json({
       message: "User successfully logged in",
       token: result.token,
