@@ -1,122 +1,13 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-}
-
-enum Status {
-  ACTIVE
-  INACTIVE
-  FULL
-}
-
-enum StockStatus {
-  OUT_OF_STOCK
-  LOW_STOCK
-  IN_STOCK
-  OVERSTOCKED
-
-  @@map("stock_status")
-}
-
-model User {
-  id                  Int                  @id @default(autoincrement())
-  name                String
-  email               String               @unique
-  password            String
-  contact             String
-  locationAssignments LocationAssignment[]
-  auditLogs           AuditLog[]
-
-  @@map("users")
-}
-
-model Location {
-  id                Int                  @id @default(autoincrement())
-  name              String               @unique
-  latitude          Float
-  longitude         Float
-  barangay          String
-  city              String
-  province          String
-  region            String
-  zipCode           String
-  country           String
-  status            Status
-  locationContacts  LocationContact[]
-  locationAssignments LocationAssignment[]
-  inventories       Inventory[]
-
-  @@map("locations")
-}
-
-model LocationAssignment {
-  id         Int      @id @default(autoincrement())
-  locationId Int      @map("location_id")
-  location   Location @relation(fields: [locationId], references: [id])
-  userId     Int      @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
-
-  @@unique([locationId, userId])
-  @@map("location_assignments")
-}
-
-model Contact {
-  id               Int               @id @default(autoincrement())
-  contactInfo      String            @unique @map("contact_info")
-  contactType      String            @map("contact_type")
-  locationContacts LocationContact[]
-
-  @@map("contacts")
-}
-
-model LocationContact {
-  id         Int      @id @default(autoincrement())
-  locationId Int      @map("location_id")
-  location   Location @relation(fields: [locationId], references: [id])
-  contactId  Int      @map("contact_id")
-  contact    Contact  @relation(fields: [contactId], references: [id])
-
-  @@unique([locationId, contactId])
-  @@map("location_contacts")
-}
-
-model Resource {
-  id          Int         @id @default(autoincrement())
-  category    String
-  name        String
-  unit        String
-  inventories Inventory[]
-
-  @@map("resources")
-}
-
-model Inventory {
-  id          Int         @id @default(autoincrement())
-  quantity    Int
-  stockLevel  StockStatus @map("stock_level")
-  lastUpdated DateTime    @updatedAt @map("last_updated")
-  locationId  Int         @map("location_id")
-  location    Location    @relation(fields: [locationId], references: [id])
-  resourceId  Int         @map("resource_id")
-  resource    Resource    @relation(fields: [resourceId], references: [id])
-  auditLogs   AuditLog[]
-
-  @@map("inventories")
-}
-
-model AuditLog {
-  id           Int       @id @default(autoincrement())
-  inventoryId  Int       @map("inventory_id")
-  inventory    Inventory @relation(fields: [inventoryId], references: [id])
-  userId       Int       @map("user_id")
-  user         User      @relation(fields: [userId], references: [id])
-  prevQuantity Int       @map("prev_quantity")
-  newQuantity  Int       @map("new_quantity")
-  timeChanged  DateTime  @default(now()) @map("time_changed")
-
-  @@map("audit_logs")
 }
