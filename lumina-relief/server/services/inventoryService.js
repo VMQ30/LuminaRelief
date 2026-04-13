@@ -1,4 +1,4 @@
-import prisma from "../config/database.js";
+import pool from "../config/database.js";
 import auditLogService from "./auditLogsService.js";
 import {
   inventorySchema,
@@ -43,6 +43,7 @@ const inventoryService = {
   },
 
   async updateInventory(data) {
+    console.log(data);
     const validatedData = updateInventorySchema.parse(data);
     const client = await pool.connect();
 
@@ -58,7 +59,7 @@ const inventoryService = {
       if (!currentItem) throw new Error("Inventory record not found");
 
       const prevQuantity = currentItem.quantity;
-      let change = validated.changeAmount;
+      let change = validatedData.changeAmount;
 
       let newQuantity;
       if (validatedData.action === "ADD") {
@@ -83,12 +84,15 @@ const inventoryService = {
         validatedData.inventoryId,
       ]);
 
-      await auditLogService.setAuditLog({
-        inventoryId: validatedData.inventoryId,
-        userId: validatedData.userId,
-        prevQuantity: prevQuantity,
-        newQuantity: newQuantity,
-      });
+      await auditLogService.setAuditLog(
+        {
+          inventoryId: validatedData.inventoryId,
+          userId: validatedData.userId,
+          prevQuantity: prevQuantity,
+          newQuantity: newQuantity,
+        },
+        client,
+      );
 
       await client.query("COMMIT");
       return { success: true, message: "Inventory successfully updated" };

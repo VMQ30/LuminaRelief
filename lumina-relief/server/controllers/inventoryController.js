@@ -35,14 +35,18 @@ export const setInventory = async (req, res) => {
 
 export const updateInventory = async (req, res) => {
   try {
-    const { inventoryId, changeAmount } = req.body;
-    const updatedInventory = await inventoryService.updateInventory({
+    const inventoryId = req.params.id ?? req.body.inventoryId;
+    const { changeAmount, action } = req.body;
+    const updatedData = {
       inventoryId,
+      action,
       changeAmount,
       userId: req.user.id,
-    });
+    };
+    const updatedInventory =
+      await inventoryService.updateInventory(updatedData);
     return res.status(201).json({
-      message: "Inventory successfully added",
+      message: "Inventory successfully updated",
       inventory: updatedInventory,
     });
   } catch (e) {

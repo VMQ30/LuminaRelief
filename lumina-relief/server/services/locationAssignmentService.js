@@ -19,7 +19,10 @@ const locationAssignmentService = {
     WHERE location_id = $1 AND user_id = $2
     `;
 
-    const dupResults = await pool.query(queryDup, [locationId, userId]);
+    const dupResults = await pool.query(queryDup, [
+      validatedData.locationId,
+      validatedData.userId,
+    ]);
     if (dupResults.rows.length > 0) {
       throw new Error("User is already assigned to this location");
     }
@@ -29,7 +32,10 @@ const locationAssignmentService = {
       VALUES ($1, $2)
       RETURNING *;
     `;
-    await pool.query(insertQuery, [locationId, userId]);
+    await pool.query(insertQuery, [
+      validatedData.locationId,
+      validatedData.userId,
+    ]);
 
     return { success: true, message: "Assignment successfully created" };
   },

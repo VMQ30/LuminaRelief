@@ -2,7 +2,7 @@ import pool from "../config/database.js";
 import { auditLogsSchema } from "../validators/auditLogsValidator.js";
 
 const auditLogService = {
-  async setAuditLog(data) {
+  async setAuditLog(data, client = null) {
     const validatedData = auditLogsSchema.parse(data);
 
     const query = `
