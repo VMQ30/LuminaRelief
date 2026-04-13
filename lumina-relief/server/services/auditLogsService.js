@@ -1,4 +1,4 @@
-import prisma from "../config/database.js";
+import pool from "../config/database.js";
 
 const auditLogService = {
   async setAuditLog(data) {
