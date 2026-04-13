@@ -1,4 +1,5 @@
-import prisma from "../config/database.js";
+import pool from "../config/database.js";
+import { contactSchema } from "../validators/contactValidator.js";
 
 const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const PH_PHONE_REGEX = /^(09|\+639)\d{9}$/;
@@ -49,29 +50,36 @@ export const formatContactInfo = (input) => {
 
 export const contactService = {
   async createContact(data) {
-    if (!data.contact) {
-      throw new Error("Missing required fields");
+    const validatedData = contactSchema.parse(data);
+    const { value, type } = validatedData.contact;
+
+    const query = `
+    SELECT * FROM contacts
+    WHERE contact_info = $1
+    `;
+
+    const results = await pool.query(query, [value]);
+
+    if (results.rows.length > 0) {
+      return {
+        success: true,
+        message: "Contact already exists",
+        data: results.rows[0],
+      };
     }
 
-    const { value, type } = formatContactInfo(data.contact);
+    const insertQuery = `
+      INSERT INTO contacts (contact_info, contact_type)
+      VALUES ($1, $2)
+      RETURNING *;
+    `;
 
-    if (!type) {
-      throw new Error(
-        "Invalid contact format. Must be a valid Email , Website , or PH Phone/Hotline number.",
-      );
-    }
+    const insertResult = await pool.query(insertQuery, [value, type]);
 
-    const existing = await prisma.contact.findUnique({
-      where: { contactInfo: value },
-    });
-
-    if (existing) return existing;
-
-    return await prisma.contact.create({
-      data: {
-        contactInfo: value,
-        contactType: type,
-      },
-    });
+    return {
+      success: true,
+      message: "Contact created successfully",
+      data: insertResult.rows[0],
+    };
   },
 };

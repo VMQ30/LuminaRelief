@@ -1,28 +1,24 @@
 import pool from "../config/database.js";
+import { auditLogsSchema } from "../validators/auditLogsValidator.js";
 
 const auditLogService = {
   async setAuditLog(data) {
-    if (
-      !data.inventoryId ||
-      !data.userId ||
-      data.prevQuantity === undefined ||
-      data.newQuantity === undefined
-    ) {
-      throw new Error("All fields are required");
-    }
+    const validatedData = auditLogsSchema.parse(data);
 
-    const inventoryId = +data.inventoryId;
-    const userId = +data.userId;
-    const prevQuantity = +data.prevQuantity;
-    const newQuantity = +data.newQuantity;
+    const query = `
+    INSERT INTO audit_logs (inventory_id , user_id , prev_quantity, new_quantity)
+    VALUES ($1 , $2, $3, $4)
+    `;
 
-    if ([inventoryId, userId, prevQuantity, newQuantity].some(isNaN)) {
-      throw new Error("Invalid values provided for audit log");
-    }
+    const values = [
+      validatedData.inventoryId,
+      validatedData.userId,
+      validatedData.prevQuantity,
+      validatedData.newQuantity,
+    ];
 
-    return prisma.auditLog.create({
-      data: { inventoryId, userId, prevQuantity, newQuantity },
-    });
+    await pool.query(query, values);
+    return { success: true, message: "Audit log successfully created" };
   },
 };
 
