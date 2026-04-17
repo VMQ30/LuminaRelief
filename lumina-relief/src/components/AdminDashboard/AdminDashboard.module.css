@@ -1,0 +1,470 @@
+.wrapper {
+  display: flex;
+  background-color: #f1f5f9; /* Soft gray base */
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background-color: #fcfcfc; /* Very light neutral background */
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes profile to bottom */
+  height: 100vh;
+  padding: 1.5rem 0.75rem; /* Narrower horizontal padding for the pill effect */
+}
+
+/* Brand Section */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0.75rem 2.5rem 0.75rem;
+}
+
+.brandIcon {
+  background-color: #38b2ac;
+  color: white;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.brandName {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #333;
+}
+.brandName span {
+  color: #38b2ac;
+}
+.brandSub {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: -2px;
+}
+
+/* Navigation Items */
+.sectionLabel {
+  font-size: 0.8rem;
+  color: #888;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.navItem,
+.navItemActive {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  border-radius: 10px; /* Pill shape */
+  transition: all 0.2s ease;
+}
+
+.navItem {
+  color: #4a5568;
+}
+
+.navItemActive {
+  background-color: #f1f1f1; /* The grey pill background from photo */
+  color: #1a202c;
+  font-weight: 700;
+}
+
+/* User Profile Section (Bottom) */
+.sidebarBottom {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 1rem;
+  margin: 0 0.5rem;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.5rem;
+}
+
+.avatarCircle {
+  width: 40px;
+  height: 40px;
+  background-color: #e6fffa;
+  color: #319795;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.userMeta {
+  flex: 1;
+}
+
+.profileName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.roleBadge {
+  background-color: #e6fffa;
+  color: #38b2ac;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 12px;
+  border-radius: 50px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.logoutIcon {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.logoutIcon:hover {
+  color: #e53e3e;
+}
+/* Main Area */
+.main {
+  flex: 1;
+  padding: 2rem 3rem;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+.header h1 span {
+  color: #38b2ac;
+}
+.header p {
+  color: #718096;
+  margin-bottom: 2.5rem;
+}
+
+/* Stats Cards */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.statHeader p {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a0aec0;
+}
+
+.iconCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teal {
+  background: #e6fffa;
+  color: #319795;
+}
+.orange {
+  background: #fffaf0;
+  color: #dd6b20;
+}
+.blue {
+  background: #ebf8ff;
+  color: #3182ce;
+}
+.green {
+  background: #f0fff4;
+  color: #38a169;
+}
+
+.statCard h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a202c;
+}
+.statCard span {
+  font-size: 0.8rem;
+  color: #a0aec0;
+}
+
+/* Dashboard Content Grid */
+.dashboardGridWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.contentCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  height: 100%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+/* Badges */
+.lowBadge {
+  color: #dd6b20;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.outBadge {
+  color: #e53e3e;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2:1 ratio for the two cards */
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.contentCard {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.alertHeader {
+  color: #718096;
+  font-size: 0.8rem;
+}
+
+/* Stock List Item Styling */
+.stockList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stockItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+}
+
+.itemName {
+  font-weight: 700;
+  color: #1a202c;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.itemLoc {
+  font-size: 0.8rem;
+  color: #a0aec0;
+}
+
+/* Status Badges */
+.statusBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lowStock {
+  background: #fffaf0; /* Light orange */
+  color: #dd6b20;
+  border: 1px solid #fbd38d;
+}
+
+.outOfStock {
+  background: #fff5f5; /* Light red */
+  color: #e53e3e;
+  border: 1px solid #feb2b2;
+}
+
+/* Activity Feed Styling */
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.activityItem {
+  display: flex;
+  gap: 12px;
+  position: relative;
+}
+
+.activityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.dotTeal {
+  background: #38b2ac;
+} /* Matches Lumina Teal */
+
+.activityContent {
+  flex: 1;
+}
+
+.activityText {
+  font-size: 0.9rem;
+  color: #1a202c;
+}
+
+.activitySub {
+  font-size: 0.8rem;
+  color: #718096;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.activityTime {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  white-space: nowrap;
+}
+/* Container for the list */
+.shipmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.shipmentItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ID and ETA row */
+.shipmentTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shipmentId {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #1a202c;
+}
+
+.iconTeal {
+  color: #38b2ac;
+}
+
+.etaText {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #718096;
+}
+
+.shipmentDest {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+/* Progress Bar Styling */
+.progressContainer {
+  width: 100%;
+  height: 6px;
+  background-color: #edf2f7; /* Light gray track */
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: #38b2ac; /* Lumina Teal */
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+/* Optional: View All Button for Card Headers */
+.viewAllBtn {
+  background: none;
+  border: none;
+  color: #38b2ac;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.viewAllBtn:hover {
+  background-color: #e6fffa;
+}

@@ -50,6 +50,10 @@ img {
   display: block;
 }
 
+nav {
+  height: 10vh;
+}
+
 /* Custom Selection Color (matches the Lumina theme) */
 ::selection {
   background-color: var(--accent-teal);
