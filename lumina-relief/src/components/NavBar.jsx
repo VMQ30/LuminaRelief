@@ -1,5 +1,6 @@
 import React from "react";
-import styles from "./NavBar.module.css";
+import styles from "../styles/NavBar.module.css";
+import { Link } from "react-router-dom";
 function NavBar() {
   return (
     <>
@@ -10,7 +11,9 @@ function NavBar() {
         <div className={styles.navLinks}>
           <a href="#mission">Our Mission</a>
           <a href="#logistics">Logistics</a>
-          <button className={styles.loginBtn}>Portal Access</button>
+          <Link to="/login" className={styles.portalBtn}>
+            Portal Access
+          </Link>
         </div>
       </nav>
       ;

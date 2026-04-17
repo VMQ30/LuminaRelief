@@ -1,0 +1,213 @@
+.signInWrapper {
+  display: flex;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  background-color: #ffffff;
+}
+
+/* --- Left Column: Brand Side --- */
+.brandSide {
+  flex: 1.2;
+  /* UPDATED: High-end ombre gradient base */
+  background: linear-gradient(135deg, #101620 0%, #1a202c 60%, #1e293b 100%);
+  color: #ffffff;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* REQUIRED for the ombre glow overlay */
+  position: relative;
+  overflow: hidden; /* Keeps the glow inside the container */
+}
+
+.ombreGlow {
+  position: absolute;
+  top: -20%;
+  right: -25%;
+  width: 100%;
+  height: 100%;
+  /* Pure Lumina Teal at very low opacity */
+  background: radial-gradient(
+    circle,
+    rgba(54, 195, 188, 0.285) 0%,
+    rgba(54, 195, 188, 0.05) 70%
+  );
+  border-radius: 50%;
+  pointer-events: none; /* Make sure users can't click it */
+  filter: blur(100px); /* Softens the edge */
+}
+
+/* Ensure existing content stays on top of the new glow */
+.topInfo,
+.brandMotto,
+.footerInfo {
+  position: relative;
+  z-index: 10;
+}
+
+.topInfo .brandName {
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.brandName span {
+  color: #38b2ac; /* Lumina Teal */
+}
+
+.brandSub {
+  font-size: 0.85rem;
+  color: #a0aec0;
+}
+
+/* Center Content on Left */
+.brandMotto {
+  margin-top: -4rem; /* Optical centering */
+  max-width: 480px;
+}
+
+.iconCircle {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.iconTeal {
+  color: #38b2ac;
+}
+
+.brandMotto h2 {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+.heartText {
+  color: #38b2ac;
+}
+
+.brandMotto p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.footerInfo {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+/* --- Right Column: Form Side --- */
+.formSide {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 400px;
+}
+
+.formHeader {
+  margin-bottom: 3rem;
+  text-align: left;
+}
+
+.portalPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #e6fffa;
+  color: #319795;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 50px;
+  margin-bottom: 1.5rem;
+}
+
+.formHeader h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.formHeader p {
+  color: #718096;
+}
+
+/* The Form Itself */
+.inputGroup {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1a202c;
+  margin-bottom: 8px;
+}
+
+.inputGroup input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #fafafa;
+  transition: border-color 0.2s;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #38b2ac;
+  box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.1);
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background-color: #38b2ac;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primaryBtn:hover {
+  background-color: #319795;
+}
+
+input {
+  caret-color: #319795;
+}
+/* Responsive: Collapse to 1 column on mobile */
+@media (max-width: 900px) {
+  .signInWrapper {
+    flex-direction: column-reverse; /* Put form on top on mobile */
+  }
+
+  .brandSide {
+    padding: 3rem 2rem;
+  }
+
+  .brandMotto h2 {
+    font-size: 2.2rem;
+  }
+}

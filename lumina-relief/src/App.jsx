@@ -1,12 +1,13 @@
 import { Lamp } from "lucide-react";
 import LandingPage from "./components/LandingPage/LandingPage";
-import NavBar from "./components/NavBar/NavBar";
-import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import SignIn from "./routes/SignIn";
+import AdminDashboard from "./routes/AdminDashboard";
+
 function App() {
   return (
     <>
       <main>
-        <AdminDashboard />
+        <LandingPage />
       </main>
     </>
   );

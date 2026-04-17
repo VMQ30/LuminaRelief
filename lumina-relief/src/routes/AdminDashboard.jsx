@@ -11,8 +11,28 @@ import {
   Info,
   LogOut,
 } from "lucide-react";
-import styles from "./AdminDashboard.module.css";
+import styles from "../styles/AdminDashboard.module.css";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
+import { Link } from "react-router-dom";
 
+// Mock data for the chart
+const impactData = [
+  { name: "Mon", dist: 400 },
+  { name: "Tue", dist: 300 },
+  { name: "Wed", dist: 600 },
+  { name: "Thu", dist: 800 },
+  { name: "Fri", dist: 500 },
+  { name: "Sat", dist: 900 },
+  { name: "Sun", dist: 700 },
+];
 const AdminDashboard = () => {
   return (
     <div className={styles.wrapper}>
@@ -56,9 +76,9 @@ const AdminDashboard = () => {
               <p className={styles.profileName}>Ava Admin</p>
               <span className={styles.roleBadge}>ADMIN</span>
             </div>
-            <button className={styles.logoutIcon} title="Logout">
+            <Link to="/" className={styles.logoutIcon}>
               <LogOut size={18} />
-            </button>
+            </Link>
           </div>
         </div>
       </aside>
@@ -220,6 +240,89 @@ const AdminDashboard = () => {
                     className={styles.progressBar}
                     style={{ width: "90%" }}
                   ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.dashboardGrid}>
+            {/* Existing Critical Stock Card... */}
+
+            {/* NEW: Distribution Impact Chart */}
+            <div className={styles.contentCard}>
+              <div className={styles.cardHeader}>
+                <h3>Distribution Impact</h3>
+                <span className={styles.alertHeader}>Weekly Supplies Out</span>
+              </div>
+              <div className={styles.chartWrapper}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={impactData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f0f0f0"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: "#a0aec0" }}
+                    />
+                    <YAxis hide />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "10px",
+                        border: "none",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="dist"
+                      stroke="#38b2ac"
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: "#38b2ac" }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* NEW: Active Dispatches Timeline */}
+            <div className={styles.contentCard}>
+              <div className={styles.cardHeader}>
+                <h3>Active Dispatches</h3>
+                <span className={styles.alertHeader}>3 Live Tracking</span>
+              </div>
+              <div className={styles.shipmentList}>
+                <div className={styles.shipmentItem}>
+                  <div className={styles.shipmentMeta}>
+                    <span className={styles.truckId}>TRK-8802</span>
+                    <span className={styles.etaText}>ETA: 2h 15m</span>
+                  </div>
+                  <p className={styles.destination}>to Davao Forward Base</p>
+                  <div className={styles.progressContainer}>
+                    <div
+                      className={styles.progressBar}
+                      style={{ width: "65%" }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className={styles.shipmentItem}>
+                  <div className={styles.shipmentMeta}>
+                    <span className={styles.truckId}>TRK-9124</span>
+                    <span className={styles.etaText}>ETA: 45m</span>
+                  </div>
+                  <p className={styles.destination}>
+                    to Tacloban Relief Center
+                  </p>
+                  <div className={styles.progressContainer}>
+                    <div
+                      className={styles.progressBar}
+                      style={{ width: "85%" }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
