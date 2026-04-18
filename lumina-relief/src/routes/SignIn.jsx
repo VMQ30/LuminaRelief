@@ -1,6 +1,7 @@
 import React from "react";
 import { Sparkles, ArrowRight, UserCircle } from "lucide-react";
 import styles from "../styles/SignIn.module.css";
+import { Link } from "react-router-dom";
 
 const SignIn = () => {
   return (
@@ -68,6 +69,9 @@ const SignIn = () => {
               Access Portal
             </button>
           </form>
+          <p className={styles.switchAuth}>
+            Don't have an account? <Link to="/register">Sign Up</Link>
+          </p>
         </div>
       </div>
     </div>

@@ -6,7 +6,8 @@ import "./index.css";
 
 import LandingPage from "./routes/LandingPage.jsx";
 import SignIn from "./routes/SignIn.jsx";
-import Dashboard from "./routes/AdminDashboard.jsx";
+import CompanyDashboard from "./routes/CompanyDashboard.jsx";
+import SignUp from "./routes/SignUp.jsx";
 
 const router = createBrowserRouter([
   {
@@ -18,8 +19,12 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
+    path: "/register",
+    element: <SignUp />,
+  },
+  {
     path: "/portal",
-    element: <Dashboard />,
+    element: <CompanyDashboard />,
     children: [
       // If you want to nest pages inside the dashboard later:
       // { path: "inventory", element: <Inventory /> },
