@@ -1,18 +1,6 @@
 import React from "react";
-import {
-  LayoutDashboard,
-  Package,
-  MapPin,
-  Database,
-  ClipboardList,
-  Bell,
-  CheckCircle2,
-  Activity,
-  LogOut,
-  TrendingUp,
-  Warehouse,
-  AlertTriangle,
-} from "lucide-react";
+import { CheckCircle2, Activity, AlertTriangle } from "lucide-react";
+import Sidebar from "../components/Sidebar"; // Import the new component
 import styles from "../styles/CompanyDashboard.module.css";
 import {
   ResponsiveContainer,
@@ -23,9 +11,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { Link } from "react-router-dom";
 
-// Data now represents "Units Distributed" throughout the day
 const hubActivityData = [
   { name: "8AM", units: 45 },
   { name: "10AM", units: 180 },
@@ -38,49 +24,7 @@ const hubActivityData = [
 const CompanyDashboard = () => {
   return (
     <div className={styles.wrapper}>
-      {/* Sidebar */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarTop}>
-          <div className={styles.brand}>
-            <div className={styles.brandIcon}>L</div>
-            <div className={styles.brandText}>
-              <div className={styles.brandName}>
-                LUMINA<span>RELIEF</span>
-              </div>
-              <div className={styles.brandSub}>Hub Manager Portal</div>
-            </div>
-          </div>
-
-          <nav className={styles.navigation}>
-            <p className={styles.sectionLabel}>Hub Management</p>
-            <Link to="/portal" className={styles.navItemActive}>
-              <LayoutDashboard size={20} /> Hub Overview
-            </Link>
-            <Link to="/inventory" className={styles.navItem}>
-              <Package size={20} /> Local Stock
-            </Link>
-            <Link to="/resources" className={styles.navItem}>
-              <Database size={20} /> Resource Allocation
-            </Link>
-            <Link to="/audit" className={styles.navItem}>
-              <ClipboardList size={20} /> Hub Logs
-            </Link>
-          </nav>
-        </div>
-
-        <div className={styles.sidebarBottom}>
-          <div className={styles.userProfile}>
-            <div className={styles.avatarCircle}>NS</div>
-            <div className={styles.userMeta}>
-              <p className={styles.profileName}>Sam Samar</p>
-              <span className={styles.roleBadge}>NORTH SAMAR HUB</span>
-            </div>
-            <Link to="/" className={styles.logoutIcon}>
-              <LogOut size={18} />
-            </Link>
-          </div>
-        </div>
-      </aside>
+      <Sidebar />
 
       <main className={styles.main}>
         <header className={styles.header}>
@@ -90,7 +34,7 @@ const CompanyDashboard = () => {
           <p>Local inventory monitoring and fulfillment tracking.</p>
         </header>
 
-        {/* Localized Stats Grid - More Practical Metrics */}
+        {/* Localized Stats Grid */}
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
@@ -102,6 +46,7 @@ const CompanyDashboard = () => {
             <h2>965</h2>
             <span>Units logged & released</span>
           </div>
+
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <p>STOCK DEPLETION</p>
@@ -112,6 +57,7 @@ const CompanyDashboard = () => {
             <h2>14%</h2>
             <span>Drop since last delivery</span>
           </div>
+
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <p>HUB STATUS</p>
@@ -122,6 +68,7 @@ const CompanyDashboard = () => {
             <h2>ACTIVE</h2>
             <span>Stationary pickup in progress</span>
           </div>
+
           <div className={styles.statCard}>
             <div className={styles.statHeader}>
               <p>DEMAND FORECAST</p>
@@ -242,7 +189,7 @@ const CompanyDashboard = () => {
             </div>
           </div>
 
-          {/* Current Stock Distribution Status */}
+          {/* Current Stock Availability */}
           <div className={`${styles.contentCard} ${styles.spanTwo}`}>
             <div className={styles.cardHeader}>
               <h3>Current Stock Availability</h3>

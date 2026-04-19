@@ -537,6 +537,19 @@
   grid-column: span 2;
 }
 
+.tableRow:hover {
+  background-color: #f8fafc;
+}
+
+.tableRow td {
+  vertical-align: middle;
+}
+
+/* Ensure the header and table flow properly */
+.main {
+  background-color: #f8fafc; /* Matches the clean grey in the screenshots */
+}
+
 @media (max-width: 1100px) {
   .spanTwo {
     grid-column: span 1;
