@@ -8,13 +8,22 @@ import {
   Filter,
   Package,
   ChevronDown,
+  X,
 } from "lucide-react";
 import styles from "../styles/CompanyDashboard.module.css";
 
 const Inventory = () => {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Mock data matching your SQL schema and image_53d806.png
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    unit: "",
+    quantity: "",
+    capacity: "",
+  });
+
   const stockItems = [
     {
       id: 1,
@@ -70,7 +79,17 @@ const Inventory = () => {
 
   const filters = ["All", "In Stock", "Low", "Out", "Overstocked"];
 
-  // Helper to get status color classes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("New Resource Data:", formData);
+    setIsModalOpen(false);
+  };
+
   const getStatusStyle = (status) => {
     switch (status) {
       case "IN_STOCK":
@@ -115,6 +134,7 @@ const Inventory = () => {
             </div>
             {/* ADD RESOURCE BUTTON */}
             <button
+              onClick={() => setIsModalOpen(true)}
               className={styles.viewAllBtn}
               style={{
                 background: "#38b2ac",
@@ -350,6 +370,104 @@ const Inventory = () => {
             </div>
           </div>
         </div>
+
+        {/* MODAL SECTION - This was missing */}
+        {isModalOpen && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
+                <h3>Add New Resource</h3>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className={styles.closeBtn}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className={styles.modalForm}>
+                <div className={styles.formGroup}>
+                  <label>Resource Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    placeholder="e.g. Rice Sacks (25kg)"
+                    required
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label>Category</label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      required
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Food">Food</option>
+                      <option value="Hydration">Hydration</option>
+                      <option value="Medical">Medical</option>
+                      <option value="Shelter">Shelter</option>
+                    </select>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Unit</label>
+                    <input
+                      type="text"
+                      name="unit"
+                      value={formData.unit}
+                      placeholder="e.g. sacks, bottles"
+                      required
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label>Initial Quantity</label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={formData.quantity}
+                      placeholder="0"
+                      required
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Max Capacity</label>
+                    <input
+                      type="number"
+                      name="capacity"
+                      value={formData.capacity}
+                      placeholder="e.g. 1000"
+                      required
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.modalActions}>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className={styles.cancelBtn}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className={styles.confirmBtn}>
+                    Register Resource
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
