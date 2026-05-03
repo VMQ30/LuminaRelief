@@ -1,6 +1,6 @@
 import resourceService from "../services/resourceService.js";
 
-const addResource = async (req, res) => {
+export const addResource = async (req, res) => {
   try {
     const { category, name, unit } = req.body;
     const newResource = await resourceService.setResource({
@@ -27,4 +27,12 @@ const addResource = async (req, res) => {
   }
 };
 
-export default addResource;
+export const getAllResources = async (req, res) => {
+  try {
+    const resources = await resourceService.getAllResource();
+    return res.status(200).json(resources);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

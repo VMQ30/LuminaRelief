@@ -20,6 +20,15 @@ const resourceService = {
       message: "New resource successfully registered",
     };
   },
+
+  async getAllResource() {
+    const query = `
+    SELECT * FROM resources
+    ORDER BY name ASC
+    `;
+    const result = await pool.query(query);
+    return result.rows;
+  },
 };
 
 export default resourceService;
