@@ -103,6 +103,37 @@ const inventoryService = {
       client.release();
     }
   },
+
+  async getAllInventory() {
+    const query = `
+    SELECT i.*, 
+    l.name as location_name, 
+    r.name as resource_name,
+    r.category as category, 
+    r.unit as unit
+    FROM inventories i
+    LEFT JOIN locations l ON i.location_id = l.location_id
+    LEFT JOIN resources r ON i.resource_id = r.resource_id
+    ORDER BY i.last_updated DESC;
+    `;
+
+    const result = await pool.query(query);
+    return result.rows;
+  },
+
+  async getInventoryById(id) {
+    const query = `
+    SELECT * 
+    FROM inventories
+    WHERE inventory_id = $1`;
+
+    const result = await pool.query(query, [id]);
+    if (result.rows.length === 0) {
+      throw new Error("Inventory record not found");
+    }
+
+    return result.rows[0];
+  },
 };
 
 export default inventoryService;

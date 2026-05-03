@@ -59,3 +59,24 @@ export const updateInventory = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getAllInventory = async (req, res) => {
+  try {
+    const items = await inventoryService.getAllInventory();
+    return res.status(200).json(items);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getInventoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await inventoryService.getInventoryById(id);
+    return res.status(200).json(item);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

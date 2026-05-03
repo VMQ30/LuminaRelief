@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import {
   Plus,
@@ -13,6 +13,8 @@ import {
 import styles from "../styles/CompanyDashboard.module.css";
 
 const Inventory = () => {
+  const [stockItems, setStockItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -24,59 +26,6 @@ const Inventory = () => {
     capacity: "",
   });
 
-  const stockItems = [
-    {
-      id: 1,
-      name: "Bottled Water (1.5L)",
-      category: "Hydration",
-      location: "Northern Samar Hub",
-      quantity: 1240,
-      status: "IN_STOCK",
-      updated: "1h ago",
-      unit: "bottles",
-    },
-    {
-      id: 2,
-      name: "Rice Sacks (25kg)",
-      category: "Food",
-      location: "Northern Samar Hub",
-      quantity: 80,
-      status: "LOW_STOCK",
-      updated: "2h ago",
-      unit: "sacks",
-    },
-    {
-      id: 3,
-      name: "Emergency Blankets",
-      category: "Shelter",
-      location: "Northern Samar Hub",
-      quantity: 0,
-      status: "OUT_OF_STOCK",
-      updated: "1d ago",
-      unit: "units",
-    },
-    {
-      id: 4,
-      name: "First Aid Kits",
-      category: "Medical",
-      location: "Tacloban Relief Center",
-      quantity: 320,
-      status: "IN_STOCK",
-      updated: "30m ago",
-      unit: "kits",
-    },
-    {
-      id: 5,
-      name: "Bottled Water (1.5L)",
-      category: "Hydration",
-      location: "Tacloban Relief Center",
-      quantity: 5800,
-      status: "OVERSTOCKED",
-      updated: "10m ago",
-      unit: "bottles",
-    },
-  ];
-
   const filters = ["All", "In Stock", "Low", "Out", "Overstocked"];
 
   const handleInputChange = (e) => {
@@ -84,10 +33,38 @@ const Inventory = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("New Resource Data:", formData);
-    setIsModalOpen(false);
+
+    try {
+      const response = await fetch("http://localhost:3000/api/inventory/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          quantity: parseInt(formData.quantity),
+          //TODO: CHANGE THIS TO NOT BE STATIC
+          locationId: 1,
+          resourceId: 1,
+        }),
+      });
+
+      if (response.ok) {
+        setIsModalOpen(false);
+        fetchInventory();
+        setFormData({
+          name: "",
+          category: "",
+          unit: "",
+          quantity: "",
+          capacity: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding resource:", error);
+    }
   };
 
   const getStatusStyle = (status) => {
@@ -104,6 +81,27 @@ const Inventory = () => {
         return { bg: "#edf2f7", color: "#4a5568", dot: "#a0aec0" };
     }
   };
+
+  const fetchInventory = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/inventory");
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setStockItems(data);
+      } else {
+        console.error("Received non-array data:", data);
+        setStockItems([]);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
 
   return (
     <div className={styles.wrapper}>
@@ -260,98 +258,32 @@ const Inventory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {stockItems.map((item) => {
-                    const style = getStatusStyle(item.status);
-                    return (
-                      <tr
-                        key={item.id}
-                        className={styles.tableRow}
-                        style={{
-                          borderBottom: "1px solid #f8fafc",
-                          transition: "0.2s",
-                        }}
-                      >
-                        <td style={{ padding: "20px" }}>
-                          <div
-                            style={{
-                              fontWeight: "700",
-                              color: "#1e293b",
-                              fontSize: "0.95rem",
-                            }}
-                          >
-                            {item.name}
-                          </div>
-                          <div
-                            style={{ fontSize: "0.75rem", color: "#64748b" }}
-                          >
-                            {item.category}
-                          </div>
-                        </td>
-                        <td style={{ color: "#64748b", fontSize: "0.9rem" }}>
-                          {item.location}
-                        </td>
-                        <td
-                          style={{
-                            textAlign: "right",
-                            fontWeight: "700",
-                            color: "#1e293b",
-                          }}
-                        >
-                          {item.quantity.toLocaleString()}{" "}
-                          <span
-                            style={{
-                              fontWeight: "400",
-                              fontSize: "0.8rem",
-                              color: "#94a3b8",
-                            }}
-                          >
-                            {item.unit}
-                          </span>
-                        </td>
-                        <td style={{ paddingLeft: "40px" }}>
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              padding: "6px 12px",
-                              borderRadius: "20px",
-                              fontSize: "0.7rem",
-                              fontWeight: "700",
-                              backgroundColor: style.bg,
-                              color: style.color,
-                            }}
-                          >
-                            <span
-                              style={{
-                                width: "6px",
-                                height: "6px",
-                                borderRadius: "50%",
-                                backgroundColor: style.dot,
-                              }}
-                            ></span>
-                            {item.status.replace("_", " ")}
-                          </span>
-                        </td>
-                        <td style={{ color: "#94a3b8", fontSize: "0.85rem" }}>
-                          {item.updated}
-                        </td>
-                        <td style={{ padding: "20px", textAlign: "center" }}>
-                          <button
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "#cbd5e1",
-                              cursor: "pointer",
-                              padding: "5px",
-                            }}
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {Array.isArray(stockItems) &&
+                    stockItems.map((item) => {
+                      const style = getStatusStyle(item.status);
+                      return (
+                        <tr key={item.inventory_id}>
+                          {" "}
+                          {/* Matches DB primary key */}
+                          <td style={{ padding: "20px" }}>
+                            <div style={{ fontWeight: "700" }}>
+                              {item.resource_name}
+                            </div>{" "}
+                            {/* Matches query alias */}
+                            <div style={{ fontSize: "0.75rem" }}>
+                              {item.category}
+                            </div>
+                          </td>
+                          <td>{item.location_name}</td>{" "}
+                          {/* Matches query alias */}
+                          <td style={{ textAlign: "right" }}>
+                            {item.quantity.toLocaleString()}{" "}
+                            <span>{item.unit}</span>
+                          </td>
+                          {/* ... */}
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
