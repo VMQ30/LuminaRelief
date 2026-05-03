@@ -1,19 +1,24 @@
-import prisma from "../config/database.js";
-import toTitleCase from "../utils/titleCase.js";
+import pool from "../config/database.js";
+import { resourceSchema } from "../validators/resourceValidator.js";
 
 const resourceService = {
   async setResource(data) {
-    if (!data.category || !data.name || !data.unit) {
-      throw new Error("All fields are required");
-    }
+    const validatedData = resourceSchema.parse(data);
 
-    const category = toTitleCase(data.category.trim());
-    const unit = toTitleCase(data.unit.trim());
-    const name = toTitleCase(data.name.trim());
+    const query = `
+    INSERT INTO resources (name , category , unit)
+    VALUES ($1 , $2 , $3)
+    `;
+    await pool.query(query, [
+      validatedData.name,
+      validatedData.category,
+      validatedData.unit,
+    ]);
 
-    return prisma.resource.create({
-      data: { category, name, unit },
-    });
+    return {
+      success: true,
+      message: "New resource successfully registered",
+    };
   },
 };
 

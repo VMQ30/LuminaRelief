@@ -1,29 +1,43 @@
-import prisma from "../config/database.js";
+import pool from "../config/database.js";
+import { locationAssignmentSchema } from "../validators/locationAssignmentValidator.js";
 
 const locationAssignmentService = {
   async createLocationAssignment(data) {
-    if (!data.locationId || !data.userId) {
-      throw new Error("All fields are required");
+    const validatedData = locationAssignmentSchema.parse(data);
+
+    const queryLoc = `
+    SELECT location_id FROM locations WHERE location_id = $1
+    `;
+
+    const locResults = await pool.query(queryLoc, [validatedData.locationId]);
+    if (locResults.rows.length === 0) {
+      throw new Error("Location not found");
     }
 
-    const locationId = +data.locationId;
-    const userId = +data.userId;
+    const queryDup = `
+    SELECT location_assignment_id FROM location_assignments 
+    WHERE location_id = $1 AND user_id = $2
+    `;
 
-    if ([locationId, userId].some(isNaN)) {
-      throw new Error("Invalid values");
+    const dupResults = await pool.query(queryDup, [
+      validatedData.locationId,
+      validatedData.userId,
+    ]);
+    if (dupResults.rows.length > 0) {
+      throw new Error("User is already assigned to this location");
     }
 
-    const locationExists = await prisma.location.findUnique({
-      where: { id: locationId },
-    });
-    if (!locationExists) throw new Error("Location not Found");
+    const insertQuery = `
+      INSERT INTO location_assignments (location_id, user_id)
+      VALUES ($1, $2)
+      RETURNING *;
+    `;
+    await pool.query(insertQuery, [
+      validatedData.locationId,
+      validatedData.userId,
+    ]);
 
-    return await prisma.locationAssignment.create({
-      data: {
-        locationId: locationId,
-        userId: userId,
-      },
-    });
+    return { success: true, message: "Assignment successfully created" };
   },
 };
 

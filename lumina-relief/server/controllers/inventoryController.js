@@ -35,14 +35,18 @@ export const setInventory = async (req, res) => {
 
 export const updateInventory = async (req, res) => {
   try {
-    const { inventoryId, changeAmount } = req.body;
-    const updatedInventory = await inventoryService.updateInventory({
+    const inventoryId = req.params.id ?? req.body.inventoryId;
+    const { changeAmount, action } = req.body;
+    const updatedData = {
       inventoryId,
+      action,
       changeAmount,
       userId: req.user.id,
-    });
+    };
+    const updatedInventory =
+      await inventoryService.updateInventory(updatedData);
     return res.status(201).json({
-      message: "Inventory successfully added",
+      message: "Inventory successfully updated",
       inventory: updatedInventory,
     });
   } catch (e) {
@@ -51,6 +55,27 @@ export const updateInventory = async (req, res) => {
     } else if (errorMessages.includes(e.message)) {
       return res.status(400).json({ message: e.message });
     }
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getAllInventory = async (req, res) => {
+  try {
+    const items = await inventoryService.getAllInventory();
+    return res.status(200).json(items);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getInventoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await inventoryService.getInventoryById(id);
+    return res.status(200).json(item);
+  } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
   }

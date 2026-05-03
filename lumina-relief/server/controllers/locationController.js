@@ -7,7 +7,7 @@ const errorMessages = [
 ];
 export const createLocation = async (req, res) => {
   try {
-    const { name, barangay, city, province, zipCode, country, status } =
+    const { name, barangay, city, province, zipCode, country, status, region } =
       req.body;
     const newLocation = await locationService.createLocation({
       name,
@@ -17,6 +17,7 @@ export const createLocation = async (req, res) => {
       zipCode,
       country,
       status,
+      region,
     });
     return res
       .status(201)

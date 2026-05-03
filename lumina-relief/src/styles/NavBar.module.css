@@ -1,0 +1,53 @@
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 5%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--lumina-glow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--relief-dark);
+}
+
+.logo span {
+  color: var(--lumina-accent);
+  text-shadow: 0 0 15px rgba(79, 209, 197, 0.4);
+}
+
+.navLinks a {
+  margin-right: 2rem;
+  text-decoration: none;
+  color: var(--relief-soft);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navLinks a:hover {
+  color: var(--lumina-accent);
+}
+
+.loginBtn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px; /* Softer edges */
+  border: 1px solid var(--lumina-accent);
+  background: transparent;
+  color: var(--lumina-accent);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.loginBtn:hover {
+  background: var(--lumina-accent);
+  color: white;
+}
