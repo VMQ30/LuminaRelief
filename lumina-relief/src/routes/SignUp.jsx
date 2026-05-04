@@ -4,8 +4,38 @@ import { Link } from "react-router-dom";
 import styles from "../styles/SignIn.module.css";
 
 const SignUp = () => {
-  const [accountType, setAccountType] = useState("company"); // 'company' or 'user'
+  const [accountType, setAccountType] = useState("company");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    contact: "",
+  });
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3000/api/user/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Registration Successful!");
+      } else {
+        alert(data.message);
+      }
+    } catch (e) {
+      console.error("Signup Error: ", e);
+    }
+  };
   return (
     <div className={styles.signInWrapper}>
       <div className={styles.brandSide}>
@@ -42,7 +72,6 @@ const SignUp = () => {
             <p>Select how you want to use the portal.</p>
           </header>
 
-          {/* NEW: Toggle Switch for Company vs User */}
           <div className={styles.toggleWrapper}>
             <button
               className={
@@ -66,16 +95,17 @@ const SignUp = () => {
             </button>
           </div>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleSubmit}>
             {accountType === "company" && (
               <>
                 <div className={styles.inputGroup}>
                   <label htmlFor="orgName">Organization Name</label>
                   <input
                     type="text"
-                    id="orgName"
+                    id="name"
                     placeholder="e.g. Red Cross Chapter"
                     required
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -86,6 +116,7 @@ const SignUp = () => {
                     id="email"
                     placeholder="company@organization.org"
                     required
+                    onChange={handleChange}
                   />
                 </div>
               </>
@@ -97,9 +128,10 @@ const SignUp = () => {
                   <label htmlFor="fullname">Full Name</label>
                   <input
                     type="text"
-                    id="fullname"
+                    id="name"
                     placeholder="Jane Doe"
                     required
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -110,6 +142,7 @@ const SignUp = () => {
                     id="email"
                     placeholder="jane@organization.org"
                     required
+                    onChange={handleChange}
                   />
                 </div>
               </>
@@ -122,6 +155,18 @@ const SignUp = () => {
                 id="password"
                 placeholder="Min. 8 characters"
                 required
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="contact">Contact</label>
+              <input
+                type="text"
+                id="contact"
+                placeholder="+63 XXX-XXX-XXXX"
+                required
+                onChange={handleChange}
               />
             </div>
 

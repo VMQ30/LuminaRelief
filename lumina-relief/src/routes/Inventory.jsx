@@ -17,7 +17,6 @@ const Inventory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const 
 
   const [formData, setFormData] = useState({
     name: "",
