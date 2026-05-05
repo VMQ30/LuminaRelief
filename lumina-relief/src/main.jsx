@@ -9,6 +9,10 @@ import SignIn from "./routes/SignIn.jsx";
 import CompanyDashboard from "./routes/CompanyDashboard.jsx";
 import SignUp from "./routes/SignUp.jsx";
 import Inventory from "./routes/Inventory.jsx";
+import ResourceAllocation from "./routes/ResourceAllocation.jsx";
+import HubLogs from "./routes/HubLogs.jsx";
+
+
 
 const router = createBrowserRouter([
   {
@@ -31,6 +35,15 @@ const router = createBrowserRouter([
     path: "/inventory",
     element: <Inventory />,
   },
+    {
+    path: "/resources",
+    element: <ResourceAllocation />,
+  },
+    {
+    path: "/audit",
+    element: <HubLogs />,
+  },
+
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
