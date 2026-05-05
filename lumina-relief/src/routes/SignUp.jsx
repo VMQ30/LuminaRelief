@@ -30,6 +30,7 @@ const SignUp = () => {
       if (response.ok) {
         alert("Registration Successful!");
       } else {
+        //TODO Change to toast or pop up instead
         alert(data.message);
       }
     } catch (e) {

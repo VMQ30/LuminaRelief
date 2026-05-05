@@ -1,9 +1,33 @@
 import React from "react";
 import { Sparkles, ArrowRight, UserCircle } from "lucide-react";
 import styles from "../styles/SignIn.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const response = await fetch("http://localhost:3000/api/user/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json;
+
+    if (response.ok) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.id);
+      navigate("/portal");
+    } else {
+      //TODO Change to toast or pop up instead
+      alert(data.message);
+    }
+  };
+
   return (
     <div className={styles.signInWrapper}>
       {/* Left Column: Brand Section */}
@@ -44,7 +68,7 @@ const SignIn = () => {
             <p>Use your organization credentials.</p>
           </header>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
               <label htmlFor="email">Email</label>
               <input
