@@ -110,6 +110,7 @@ const CompanyDashboard = () => {
                   />
                   <YAxis hide />
                   <Tooltip
+                    isAnimationActive={false}
                     contentStyle={{
                       borderRadius: "10px",
                       border: "none",
@@ -152,6 +153,15 @@ const CompanyDashboard = () => {
                 </div>
                 <span className={`${styles.statusBadge} ${styles.lowStock}`}>
                   LOW
+                </span>
+              </div>
+              <div className={styles.stockItem}>
+                <div className={styles.itemInfo}>
+                  <p className={styles.itemName}>Hygiene Kits</p>
+                  <p className={styles.itemLoc}>0 kits left</p>
+                </div>
+                <span className={`${styles.statusBadge} ${styles.outOfStock}`}>
+                  OUT OF STOCK
                 </span>
               </div>
             </div>
@@ -198,8 +208,8 @@ const CompanyDashboard = () => {
             <div className={styles.shipmentList}>
               <div className={styles.shipmentItem}>
                 <div className={styles.shipmentMeta}>
-                  <span className={styles.truckId}>Food & Grains</span>
-                  <span className={styles.etaText}>IN STOCK</span>
+                  <span className={styles.stockId}>Food & Grains</span>
+                  <span className={styles.etaInStock}>IN STOCK</span>
                 </div>
                 <p className={styles.destination}>
                   Available for immediate pickup
@@ -213,8 +223,8 @@ const CompanyDashboard = () => {
               </div>
               <div className={styles.shipmentItem}>
                 <div className={styles.shipmentMeta}>
-                  <span className={styles.truckId}>Medical Supplies</span>
-                  <span className={styles.etaText}>LIMITED</span>
+                  <span className={styles.stockId}>Medical Supplies</span>
+                  <span className={styles.etaLimited}>LIMITED</span>
                 </div>
                 <p className={styles.destination}>
                   Prioritizing emergency cases

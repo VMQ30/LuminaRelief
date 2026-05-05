@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Sparkles, ArrowRight, UserCircle } from "lucide-react";
 import styles from "../styles/SignIn.module.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -31,8 +31,28 @@ const SignIn = () => {
   return (
     <div className={styles.signInWrapper}>
       {/* Left Column: Brand Section */}
-      <div className={styles.brandSide}>
-        <div className={styles.ombreGlow}></div>
+    <div
+        className={styles.brandSide}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const glow = e.currentTarget.querySelector(`.${styles.mouseGlow}`);
+          glow.style.opacity = "1";
+          e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
+          e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
+        }}
+        onMouseLeave={(e) => {
+          const glow = e.currentTarget.querySelector(`.${styles.mouseGlow}`);
+          glow.style.opacity = "0";
+          setTimeout(() => {
+            e.currentTarget.style.setProperty("--mouse-x", `-999px`);
+            e.currentTarget.style.setProperty("--mouse-y", `-999px`);
+            glow.style.opacity = "1";
+          }, 400);
+        }}
+      >
+        <div className={styles.mouseGlow}></div>
         <div className={styles.topInfo}>
           <div className={styles.brandName}>
             LUMINA<span>RELIEF</span>
