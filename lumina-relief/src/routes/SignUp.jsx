@@ -11,6 +11,7 @@ const SignUp = () => {
     password: "",
     contact: "",
   });
+  const [errorModal, setErrorModal] = useState({ visible: false, message: "" });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -30,8 +31,21 @@ const SignUp = () => {
       if (response.ok) {
         alert("Registration Successful!");
       } else {
-        //TODO Change to toast or pop up instead
-        alert(data.message);
+        let errorMessage = data.message;
+
+        // If message is a JSON string (array of validation errors), parse and extract
+        if (typeof errorMessage === "string") {
+          try {
+            const parsed = JSON.parse(errorMessage);
+            if (Array.isArray(parsed)) {
+              errorMessage = parsed.map((err) => err.message).join(", ");
+            }
+          } catch {
+            // Not JSON, use as-is
+          }
+        }
+        
+        setErrorModal({ visible: true, message: errorMessage });
       }
     } catch (e) {
       console.error("Signup Error: ", e);
@@ -181,6 +195,21 @@ const SignUp = () => {
           </p>
         </div>
       </div>
+      {errorModal.visible && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalBox}>
+            <ShieldCheck size={28} className={styles.iconError} />
+            <h3>Registration Failed</h3>
+            <p>{errorModal.message}</p>
+            <button
+              className={styles.primaryBtn}
+              onClick={() => setErrorModal({ visible: false, message: "" })}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
