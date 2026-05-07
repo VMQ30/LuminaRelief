@@ -17,8 +17,8 @@ const inventoryService = {
     const validatedData = inventorySchema.parse(data);
 
     const query = `
-      INSERT INTO inventories (quantity, status, location_id, resource_id)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO inventories (quantity, status, location_id, resource_id, capacity)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *;
     `;
 
@@ -27,19 +27,20 @@ const inventoryService = {
       getStatus(validatedData.quantity),
       validatedData.locationId,
       validatedData.resourceId,
+      validatedData.capacity,
     ];
 
     const result = await pool.query(query, values);
     const newInventory = result.rows[0];
 
-    await auditLogService.setAuditLog({
-      inventoryId: newInventory.inventory_id,
-      userId: validatedData.userId,
-      prevQuantity: 0,
-      newQuantity: validatedData.quantity,
-    });
+    // await auditLogService.setAuditLog({
+    //   inventoryId: newInventory.inventory_id,
+    //   userId: validatedData.userId,
+    //   prevQuantity: 0,
+    //   newQuantity: validatedData.quantity,
+    // });
 
-    return { success: true, message: "Inventory successfully created" };
+    return newInventory;
   },
 
   async updateInventory(data) {

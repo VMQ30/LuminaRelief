@@ -16,7 +16,7 @@ const SignIn = () => {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await response.json;
+    const data = await response.json();
 
     if (response.ok) {
       localStorage.setItem("token", data.token);
@@ -31,7 +31,7 @@ const SignIn = () => {
   return (
     <div className={styles.signInWrapper}>
       {/* Left Column: Brand Section */}
-    <div
+      <div
         className={styles.brandSide}
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();

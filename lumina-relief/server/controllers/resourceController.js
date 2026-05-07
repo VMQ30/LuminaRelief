@@ -11,14 +11,21 @@ export const addResource = async (req, res) => {
 
     return res.status(201).json({
       message: "Successfully added resource",
-      data: newResource,
+      data: {
+        ...newResource,
+        resource_id:
+          newResource.id ?? newResource.resource_id ?? newResource.resourceId,
+        id: newResource.id ?? newResource.resource_id ?? newResource.resourceId,
+        resourceId:
+          newResource.id ?? newResource.resource_id ?? newResource.resourceId,
+      },
     });
   } catch (e) {
     if (e.message == "All fields are required") {
       return res.status(400).json({ message: e.message });
     } else if (e.code === "P2002") {
       return res.status(409).json({
-        message: "This resourcealready exists",
+        message: "This resource already exists",
       });
     }
 
