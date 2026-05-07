@@ -10,17 +10,18 @@ const errorMessages = [
 
 export const setInventory = async (req, res) => {
   try {
-    const { quantity, locationId, resourceId } = req.body;
+    const { quantity, locationId, resourceId, capacity } = req.body;
 
     const newInventory = await inventoryService.setInventory({
       quantity,
       locationId,
       resourceId,
+      capacity,
       userId: req.user.id,
     });
     return res.status(201).json({
       message: "Inventory successfully added",
-      inventory: newInventory,
+      data: newInventory,
     });
   } catch (e) {
     if (e.code === "P2002") {

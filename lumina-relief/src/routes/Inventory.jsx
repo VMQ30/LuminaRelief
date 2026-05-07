@@ -36,10 +36,9 @@ const Inventory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const locationId = parseInt(localStorage.getItem("userId"), 10);
+    let locationId = parseInt(localStorage.getItem("userId"), 10);
     if (!locationId || Number.isNaN(locationId)) {
-      alert("Unable to create inventory: missing user location ID.");
-      return;
+      locationId = 1;
     }
 
     try {
@@ -57,6 +56,7 @@ const Inventory = () => {
       });
 
       const responseData = await response.json();
+      console.log("SERVER RESPONSE:", responseData);
 
       if (!response.ok) {
         if (response.status === 409) {
@@ -67,28 +67,40 @@ const Inventory = () => {
         return;
       }
 
-      const createdResource = responseData.data;
-      if (!createdResource || !createdResource.resource_id) {
+      const createdResource = responseData.data || responseData;
+      const resourceId =
+        createdResource.resource_id ||
+        createdResource.resourceId ||
+        createdResource.id;
+
+      if (!resourceId) {
         alert("Resource created but no resource ID was returned.");
         return;
       }
 
-      const inventoryResponse = await fetch("http://localhost:3000/api/inventory/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const inventoryResponse = await fetch(
+        "http://localhost:3000/api/inventory/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            quantity: Number(formData.quantity),
+            capacity: Number(formData.capacity),
+            locationId: Number(locationId), // Convert to Number
+            resourceId: Number(resourceId),
+          }),
         },
-        body: JSON.stringify({
-          quantity: parseInt(formData.quantity, 10),
-          locationId,
-          resourceId: createdResource.resource_id,
-        }),
-      });
+      );
 
       const inventoryData = await inventoryResponse.json();
       if (!inventoryResponse.ok) {
-        alert(inventoryData.message || "Resource created, but inventory record could not be created.");
+        alert(
+          inventoryData.message ||
+            "Resource created, but inventory record could not be created.",
+        );
         return;
       }
 
@@ -289,18 +301,16 @@ const Inventory = () => {
                     }}
                   >
                     <th style={{ padding: "20px" }}>RESOURCE</th>
-                    <th>LOCATION</th>
-                    <th style={{ textAlign: "right" }}>QUANTITY</th>
-                    <th style={{ paddingLeft: "40px" }}>STATUS</th>
+                    <th>CATEGORY</th>
+                    <th>QUANTITY</th>
+                    <th>STATUS</th>
                     <th>UPDATED</th>
-                    <th style={{ padding: "20px", textAlign: "center" }}>
-                      ACTIONS
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {Array.isArray(stockItems) &&
                     stockItems.map((item) => {
+                      console.log(item);
                       const style = getStatusStyle(item.status);
                       return (
                         <tr key={item.inventory_id}>
@@ -309,19 +319,23 @@ const Inventory = () => {
                           <td style={{ padding: "20px" }}>
                             <div style={{ fontWeight: "700" }}>
                               {item.resource_name}
-                            </div>{" "}
-                            {/* Matches query alias */}
-                            <div style={{ fontSize: "0.75rem" }}>
-                              {item.category}
                             </div>
                           </td>
-                          <td>{item.location_name}</td>{" "}
-                          {/* Matches query alias */}
-                          <td style={{ textAlign: "right" }}>
+                          <td>{item.category}</td>
+                          <td>
                             {item.quantity.toLocaleString()}{" "}
                             <span>{item.unit}</span>
                           </td>
-                          {/* ... */}
+                          <td>{item.status}</td>
+                          <td>
+                            {new Date(item.last_updated).toLocaleString(
+                              undefined,
+                              {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              },
+                            )}
+                          </td>
                         </tr>
                       );
                     })}

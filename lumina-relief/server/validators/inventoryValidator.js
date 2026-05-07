@@ -2,6 +2,7 @@ import { z } from "zod";
 export const inventorySchema = z.object({
   locationId: z.coerce.number().int().positive("Invalid Location ID"),
   resourceId: z.coerce.number().int().positive("Invalid Resource ID"),
+  capacity: z.number().int().positive("Invalid Resource ID"),
   userId: z.coerce.number().int().positive("Invalid User ID"),
   quantity: z.coerce.number().nonnegative("Quantity cannot be negative"),
 });

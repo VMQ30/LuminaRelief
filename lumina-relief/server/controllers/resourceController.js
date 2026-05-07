@@ -11,7 +11,14 @@ export const addResource = async (req, res) => {
 
     return res.status(201).json({
       message: "Successfully added resource",
-      data: newResource,
+      data: {
+        ...newResource,
+        resource_id:
+          newResource.id ?? newResource.resource_id ?? newResource.resourceId,
+        id: newResource.id ?? newResource.resource_id ?? newResource.resourceId,
+        resourceId:
+          newResource.id ?? newResource.resource_id ?? newResource.resourceId,
+      },
     });
   } catch (e) {
     if (e.message == "All fields are required") {

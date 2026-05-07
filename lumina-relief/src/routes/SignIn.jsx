@@ -31,7 +31,7 @@ const SignIn = () => {
   return (
     <div className={styles.signInWrapper}>
       {/* Left Column: Brand Section */}
-    <div
+      <div
         className={styles.brandSide}
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
