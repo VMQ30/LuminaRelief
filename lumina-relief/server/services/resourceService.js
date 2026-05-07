@@ -8,17 +8,16 @@ const resourceService = {
     const query = `
     INSERT INTO resources (name , category , unit)
     VALUES ($1 , $2 , $3)
+    RETURNING *;
     `;
-    await pool.query(query, [
+    const result = await pool.query(query, [
       validatedData.name,
       validatedData.category,
       validatedData.unit,
     ]);
 
-    return {
-      success: true,
-      message: "New resource successfully registered",
-    };
+    const newResource = result.rows[0];
+    return newResource;
   },
 
   async getAllResource() {

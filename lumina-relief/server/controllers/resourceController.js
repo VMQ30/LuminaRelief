@@ -18,7 +18,7 @@ export const addResource = async (req, res) => {
       return res.status(400).json({ message: e.message });
     } else if (e.code === "P2002") {
       return res.status(409).json({
-        message: "This resourcealready exists",
+        message: "This resource already exists",
       });
     }
 

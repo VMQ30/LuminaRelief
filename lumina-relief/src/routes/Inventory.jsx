@@ -36,34 +36,75 @@ const Inventory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const locationId = parseInt(localStorage.getItem("userId"), 10);
+    if (!locationId || Number.isNaN(locationId)) {
+      alert("Unable to create inventory: missing user location ID.");
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:3000/api/inventory/add", {
+      const response = await fetch("http://localhost:3000/api/resource/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          quantity: parseInt(formData.quantity),
-          //TODO: CHANGE THIS TO NOT BE STATIC
-          locationId: 1,
-          resourceId: 1,
+          name: formData.name,
+          category: formData.category,
+          unit: formData.unit,
         }),
       });
 
-      if (response.ok) {
-        setIsModalOpen(false);
-        fetchInventory();
-        setFormData({
-          name: "",
-          category: "",
-          unit: "",
-          quantity: "",
-          capacity: "",
-        });
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          alert(responseData.message || "Resource already exists.");
+        } else {
+          alert(responseData.message || "Unable to create resource.");
+        }
+        return;
       }
+
+      const createdResource = responseData.data;
+      if (!createdResource || !createdResource.resource_id) {
+        alert("Resource created but no resource ID was returned.");
+        return;
+      }
+
+      const inventoryResponse = await fetch("http://localhost:3000/api/inventory/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          quantity: parseInt(formData.quantity, 10),
+          locationId,
+          resourceId: createdResource.resource_id,
+        }),
+      });
+
+      const inventoryData = await inventoryResponse.json();
+      if (!inventoryResponse.ok) {
+        alert(inventoryData.message || "Resource created, but inventory record could not be created.");
+        return;
+      }
+
+      alert("Resource and inventory created successfully.");
+      setIsModalOpen(false);
+      fetchInventory();
+      setFormData({
+        name: "",
+        category: "",
+        unit: "",
+        quantity: "",
+        capacity: "",
+      });
     } catch (error) {
       console.error("Error adding resource:", error);
+      alert("An unexpected error occurred while creating the resource.");
     }
   };
 
