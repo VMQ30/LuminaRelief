@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import {
   Plus,
@@ -12,76 +12,6 @@ import {
   TrendingDown,
 } from "lucide-react";
 import styles from "../styles/CompanyDashboard.module.css";
-
-// ─── Mock Data ───────────────────────────────────────────────────────────────
-const MOCK_INVENTORY = [
-  {
-    id: 1,
-    resource_name: "Rice Sacks (25kg)",
-    category: "Food",
-    unit: "sacks",
-    quantity: 80,
-    capacity: 500,
-    status: "LOW_STOCK",
-    location_name: "Northern Samar Hub",
-    last_updated: "2025-07-15T08:30:00",
-  },
-  {
-    id: 2,
-    resource_name: "Bottled Water (500ml)",
-    category: "Hydration",
-    unit: "bottles",
-    quantity: 1200,
-    capacity: 2000,
-    status: "IN_STOCK",
-    location_name: "Northern Samar Hub",
-    last_updated: "2025-07-15T09:00:00",
-  },
-  {
-    id: 3,
-    resource_name: "First Aid Kits",
-    category: "Medical",
-    unit: "kits",
-    quantity: 12,
-    capacity: 100,
-    status: "LOW_STOCK",
-    location_name: "Northern Samar Hub",
-    last_updated: "2025-07-15T07:45:00",
-  },
-  {
-    id: 4,
-    resource_name: "Emergency Blankets",
-    category: "Shelter",
-    unit: "pcs",
-    quantity: 0,
-    capacity: 300,
-    status: "OUT_OF_STOCK",
-    location_name: "Northern Samar Hub",
-    last_updated: "2025-07-14T18:00:00",
-  },
-  {
-    id: 5,
-    resource_name: "Canned Goods (Assorted)",
-    category: "Food",
-    unit: "cans",
-    quantity: 2400,
-    capacity: 2000,
-    status: "OVERSTOCKED",
-    location_name: "Northern Samar Hub",
-    last_updated: "2025-07-15T06:00:00",
-  },
-  {
-    id: 6,
-    resource_name: "IV Fluid Sets",
-    category: "Medical",
-    unit: "sets",
-    quantity: 45,
-    capacity: 150,
-    status: "IN_STOCK",
-    location_name: "Northern Samar Hub",
-    last_updated: "2025-07-15T10:00:00",
-  },
-];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const getStatusConfig = (status) => {
@@ -114,7 +44,8 @@ const formatTime = (iso) => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const ResourceAllocation = ({ onLogEntry }) => {
-  const [inventory, setInventory] = useState(MOCK_INVENTORY);
+  const [inventory, setInventory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [modal, setModal] = useState(null); // { item, mode: 'add' | 'subtract' }
   const [allocationAmt, setAllocationAmt] = useState("");
   const [reason, setReason] = useState("");
@@ -151,43 +82,72 @@ const ResourceAllocation = ({ onLogEntry }) => {
     setReason("");
   };
 
-  const handleAllocate = () => {
+  const fetchInventory = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:3000/api/inventory");
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setInventory(data);
+      }
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const handleAllocate = async () => {
     const amt = parseInt(allocationAmt);
     if (!amt || amt <= 0) return;
+    const itemId = modal.item.inventory_id || modal.item.id;
 
-    setInventory((prev) =>
-      prev.map((inv) => {
-        if (inv.id !== modal.item.id) return inv;
-        const newQty =
-          modal.mode === "add"
-            ? inv.quantity + amt
-            : Math.max(0, inv.quantity - amt);
-        const newStatus = deriveStatus(newQty, inv.capacity);
-        return {
-          ...inv,
-          quantity: newQty,
-          status: newStatus,
-          last_updated: new Date().toISOString(),
-        };
-      })
-    );
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/inventory/${modal.item.inventory_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            changeAmount: amt,
+            action: modal.mode === "add" ? "ADD" : "SUBTRACT",
+          }),
+        }
+      );
 
-    // Push log entry up to parent (HubLogs or shared state)
-    if (onLogEntry) {
-      onLogEntry({
-        id: Date.now(),
-        type: modal.mode === "add" ? "ALLOCATION_IN" : "ALLOCATION_OUT",
-        resource: modal.item.resource_name,
-        category: modal.item.category,
-        amount: amt,
-        unit: modal.item.unit,
-        reason: reason || "No reason provided",
-        timestamp: new Date().toISOString(),
-        location: modal.item.location_name,
-      });
+      if (response.ok) {
+        // Refresh data from server to get updated quantities and statuses
+        await fetchInventory();
+        
+        if (onLogEntry) {
+          onLogEntry({
+            id: Date.now(),
+            type: modal.mode === "add" ? "ALLOCATION_IN" : "ALLOCATION_OUT",
+            resource: modal.item.resource_name,
+            category: modal.item.category,
+            amount: amt,
+            unit: modal.item.unit,
+            reason: reason || "No reason provided",
+            timestamp: new Date().toISOString(),
+            location: modal.item.location_name,
+          });
+        }
+        closeModal();
+      } else {
+        const err = await response.json();
+        alert(err.message || "Failed to update inventory");
+      }
+    } catch (error) {
+      console.error("Error updating inventory:", error);
+      alert("Network error occurred");
     }
-
-    closeModal();
   };
 
   const summaryStats = {
@@ -274,22 +234,24 @@ const ResourceAllocation = ({ onLogEntry }) => {
                 gap: "16px",
               }}
             >
-              <input
-                type="text"
-                placeholder="Search resources or categories…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  flex: 1,
-                  minWidth: "240px",
-                  padding: "10px 16px",
-                  borderRadius: "10px",
-                  border: "1px solid #e2e8f0",
-                  backgroundColor: "#f8fafc",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                }}
-              />
+              <div style={{ flex: 1, minWidth: "240px", position: "relative" }}>
+                <input
+                  type="text"
+                  placeholder="Search resources or categories…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    backgroundColor: "#f8fafc",
+                    fontSize: "0.9rem",
+                    outline: "none",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
               <div
                 style={{
                   display: "flex",
@@ -339,14 +301,20 @@ const ResourceAllocation = ({ onLogEntry }) => {
                     <th style={{ padding: "14px 24px" }}>RESOURCE</th>
                     <th style={{ padding: "14px 16px" }}>CATEGORY</th>
                     <th style={{ padding: "14px 16px", textAlign: "right" }}>QUANTITY</th>
-                    <th style={{ padding: "14px 16px" }}>CAPACITY</th>
+                    <th style={{ padding: "14px 16px" }}>LEVEL</th>
                     <th style={{ padding: "14px 16px" }}>STATUS</th>
                     <th style={{ padding: "14px 16px" }}>LAST UPDATED</th>
                     <th style={{ padding: "14px 24px", textAlign: "center" }}>ALLOCATE</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredItems.length === 0 ? (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#a0aec0" }}>
+                        Loading resources...
+                      </td>
+                    </tr>
+                  ) : filteredItems.length === 0 ? (
                     <tr>
                       <td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#a0aec0" }}>
                         No resources match your search.
@@ -355,10 +323,9 @@ const ResourceAllocation = ({ onLogEntry }) => {
                   ) : (
                     filteredItems.map((item) => {
                       const sc = getStatusConfig(item.status);
-                      const pct = Math.min(100, Math.round((item.quantity / item.capacity) * 100));
                       return (
                         <tr
-                          key={item.id}
+                          key={item.inventory_id}
                           style={{
                             borderBottom: "1px solid #f8f8f8",
                             transition: "background 0.15s",
@@ -366,7 +333,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
                           onMouseEnter={(e) => (e.currentTarget.style.background = "#fafffe")}
                           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                         >
-                          {/* Resource Name */}
                           <td style={{ padding: "18px 24px" }}>
                             <div style={{ fontWeight: "700", color: "#2d3748", fontSize: "0.95rem" }}>
                               {item.resource_name}
@@ -376,7 +342,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
                             </div>
                           </td>
 
-                          {/* Category */}
                           <td style={{ padding: "18px 16px" }}>
                             <span
                               style={{
@@ -392,7 +357,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
                             </span>
                           </td>
 
-                          {/* Quantity */}
                           <td style={{ padding: "18px 16px", textAlign: "right", fontWeight: "700", fontSize: "1rem", color: "#2d3748" }}>
                             {item.quantity.toLocaleString()}
                             <span style={{ fontSize: "0.75rem", color: "#a0aec0", fontWeight: "400", marginLeft: "4px" }}>
@@ -400,35 +364,12 @@ const ResourceAllocation = ({ onLogEntry }) => {
                             </span>
                           </td>
 
-                          {/* Capacity bar */}
-                          <td style={{ padding: "18px 16px", minWidth: "140px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                              <div
-                                style={{
-                                  flex: 1,
-                                  height: "6px",
-                                  borderRadius: "999px",
-                                  backgroundColor: "#edf2f7",
-                                  overflow: "hidden",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    width: `${Math.min(pct, 100)}%`,
-                                    height: "100%",
-                                    borderRadius: "999px",
-                                    backgroundColor: sc.dot,
-                                    transition: "width 0.4s ease",
-                                  }}
-                                />
-                              </div>
-                              <span style={{ fontSize: "0.75rem", color: "#94a3b8", whiteSpace: "nowrap" }}>
-                                {pct}%
-                              </span>
-                            </div>
+                          <td style={{ padding: "18px 16px" }}>
+                            <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                              {item.quantity > 100 ? "High" : item.quantity > 50 ? "Moderate" : "Low"}
+                            </span>
                           </td>
 
-                          {/* Status */}
                           <td style={{ padding: "18px 16px" }}>
                             <span
                               style={{
@@ -456,12 +397,10 @@ const ResourceAllocation = ({ onLogEntry }) => {
                             </span>
                           </td>
 
-                          {/* Last Updated */}
                           <td style={{ padding: "18px 16px", fontSize: "0.82rem", color: "#94a3b8" }}>
                             {formatTime(item.last_updated)}
                           </td>
 
-                          {/* Allocate Buttons */}
                           <td style={{ padding: "18px 24px", textAlign: "center" }}>
                             <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                               <button
@@ -481,8 +420,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
                                   cursor: "pointer",
                                   transition: "all 0.15s",
                                 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#b2f5ea")}
-                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#e6fffa")}
                               >
                                 <ArrowUpCircle size={14} /> Add
                               </button>
@@ -503,12 +440,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
                                   fontSize: "0.8rem",
                                   cursor: item.quantity === 0 ? "not-allowed" : "pointer",
                                   transition: "all 0.15s",
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (item.quantity > 0) e.currentTarget.style.backgroundColor = "#fed7d7";
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (item.quantity > 0) e.currentTarget.style.backgroundColor = "#fff5f5";
                                 }}
                               >
                                 <ArrowDownCircle size={14} /> Release
@@ -564,7 +495,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
               animation: "slideUp 0.2s ease",
             }}
           >
-            {/* Modal Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px" }}>
               <div>
                 <div
@@ -611,7 +541,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
               </button>
             </div>
 
-            {/* Amount Input */}
             <div style={{ marginBottom: "16px" }}>
               <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#4a5568", marginBottom: "8px" }}>
                 AMOUNT ({modal.item.unit})
@@ -632,15 +561,11 @@ const ResourceAllocation = ({ onLogEntry }) => {
                   fontSize: "1.1rem",
                   fontWeight: "700",
                   outline: "none",
-                  transition: "border-color 0.15s",
                   boxSizing: "border-box",
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "#38b2ac")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
               />
             </div>
 
-            {/* Reason Input */}
             <div style={{ marginBottom: "28px" }}>
               <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "700", color: "#4a5568", marginBottom: "8px" }}>
                 REASON <span style={{ color: "#a0aec0", fontWeight: "400" }}>(optional)</span>
@@ -657,15 +582,11 @@ const ResourceAllocation = ({ onLogEntry }) => {
                   border: "2px solid #e2e8f0",
                   fontSize: "0.9rem",
                   outline: "none",
-                  transition: "border-color 0.15s",
                   boxSizing: "border-box",
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "#38b2ac")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
               />
             </div>
 
-            {/* Modal Actions */}
             <div style={{ display: "flex", gap: "12px" }}>
               <button
                 onClick={closeModal}
@@ -701,7 +622,6 @@ const ResourceAllocation = ({ onLogEntry }) => {
                   fontWeight: "700",
                   cursor: !allocationAmt || parseInt(allocationAmt) <= 0 ? "not-allowed" : "pointer",
                   fontSize: "0.9rem",
-                  transition: "background 0.15s",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

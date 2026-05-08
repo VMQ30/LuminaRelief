@@ -33,12 +33,12 @@ const inventoryService = {
     const result = await pool.query(query, values);
     const newInventory = result.rows[0];
 
-    // await auditLogService.setAuditLog({
-    //   inventoryId: newInventory.inventory_id,
-    //   userId: validatedData.userId,
-    //   prevQuantity: 0,
-    //   newQuantity: validatedData.quantity,
-    // });
+    await auditLogService.setAuditLog({
+      inventoryId: newInventory.inventory_id,
+      userId: validatedData.userId,
+      prevQuantity: 0,
+      newQuantity: validatedData.quantity,
+    });
 
     return newInventory;
   },
@@ -51,7 +51,7 @@ const inventoryService = {
     try {
       await client.query("BEGIN");
 
-      const findQuery = `SELECT * FROM inventories WHERE inventory_id = $1 FOR UPDATE`;
+      const findQuery = `SELECT * FROM inventories WHERE inventory_id = $1`;
       const currentRes = await client.query(findQuery, [
         validatedData.inventoryId,
       ]);
@@ -84,7 +84,7 @@ const inventoryService = {
         getStatus(newQuantity),
         validatedData.inventoryId,
       ]);
-
+      console.log("Starting audit log...");
       await auditLogService.setAuditLog(
         {
           inventoryId: validatedData.inventoryId,
@@ -94,6 +94,7 @@ const inventoryService = {
         },
         client,
       );
+      console.log("Audit log finished!");
 
       await client.query("COMMIT");
       return { success: true, message: "Inventory successfully updated" };

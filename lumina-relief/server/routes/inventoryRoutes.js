@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.post("/add", protect, setInventory);
-router.patch("/update/:id", protect, updateInventory);
+router.put("/:id", protect, updateInventory);
 router.get("/", getAllInventory);
 router.get("/:id", getInventoryById);
 export default router;
